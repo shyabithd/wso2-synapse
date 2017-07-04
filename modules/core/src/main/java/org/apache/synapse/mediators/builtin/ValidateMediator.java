@@ -287,6 +287,7 @@ public class ValidateMediator extends AbstractListMediator implements FlowContin
                 if (sourcePath != null) {
                     msg = " for JSONPath " + sourcePath.getExpression();
                 }
+                reset();
                 handleException("Error while validating the JSON Schema" + msg, e, synCtx);
             }
         } else {
@@ -491,6 +492,18 @@ public class ValidateMediator extends AbstractListMediator implements FlowContin
             handleException("Error accessing source element : " + source, e, synCtx);
         }
         return null; // never reaches here
+    }
+
+    /**
+     * Reset all variables inside validate mediator so that they will
+     * get re-initialized on next validation request
+     */
+    private void reset() {
+        cachedSchema = null;
+        cachedPropKey = null;
+        jsonSchema = null;
+        jsonSchemaNode = null;
+        sourcePath = null;
     }
 
     /**
