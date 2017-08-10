@@ -80,8 +80,6 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 
 	private static final String REG_PROCESSOR_BASE_PATH = "/repository/components/org.apache.synapse.message.processor/";
 
-	private static final String TEXT_PLAIN = "text/plain";
-
 	private static final String MP_STATE = "MESSAGE_PROCESSOR_STATE";
 
     private static final String TASK_PREFIX = "MSMP_";
@@ -140,15 +138,14 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
         return isActivated;
     }
 
-    protected boolean isProcessorStartAsDeactivated(){
-    	// the Activate parameter is only helpful for the message processor to deply for the very first time.
+    protected boolean isProcessorStartAsDeactivated() {
+        // the Activate parameter is only helpful for the message processor to deploy for the very first time.
         // once it is deployed, the message processor should you its own state
 
         if (getProcessorState() == ProcessorState.INITIAL) {
             return !getIsActivatedParamValue();
-        } else {
-            return (getProcessorState() == ProcessorState.PAUSED);
         }
+        return (getProcessorState() == ProcessorState.PAUSED);
     }
 
     @Override
@@ -536,7 +533,7 @@ public abstract class ScheduledMessageProcessor extends AbstractMessageProcessor
 	}
 
 	private void setMessageProcessorState(ProcessorState state) {
-		registry.newNonEmptyResource(REG_PROCESSOR_BASE_PATH + getName(), false, TEXT_PLAIN, state.toString(),
+		registry.newNonEmptyResource(REG_PROCESSOR_BASE_PATH + getName(), false, "text/plain", state.toString(),
 				MP_STATE);
 	}
 }

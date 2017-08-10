@@ -511,6 +511,9 @@ public class Axis2SynapseController implements SynapseController {
         }
     }
 
+    public void destroySynapseConfiguration() {
+        destroySynapseConfiguration(false);
+    }
 
     /**
      * Waits until it is safe to stop or the the specified end time has been reached. A delay

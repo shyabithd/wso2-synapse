@@ -78,9 +78,14 @@ public interface SynapseController {
     SynapseConfiguration createSynapseConfiguration();
 
     /**
-     * Destroys the SynapseConfiguration instance
+     * Destroys the SynapseConfiguration instance, but preservers the artifacts state based on @param preserveState
      */
     void destroySynapseConfiguration(boolean preserveState);
+
+    /**
+     * Destroys the SynapseConfiguration instance
+     */
+    void destroySynapseConfiguration();
 
     /**
      * Returns underlying environment context
