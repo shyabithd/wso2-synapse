@@ -504,9 +504,9 @@ public class Axis2SynapseController implements SynapseController {
     /**
      * {@inheritDoc}
      */
-    public void destroySynapseConfiguration() {
+    public void destroySynapseConfiguration(boolean preserveState) {
         if (synapseConfiguration != null) {
-            synapseConfiguration.destroy();
+            synapseConfiguration.destroy(preserveState);
             synapseConfiguration = null;
         }
     }

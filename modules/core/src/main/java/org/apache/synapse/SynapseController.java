@@ -80,7 +80,7 @@ public interface SynapseController {
     /**
      * Destroys the SynapseConfiguration instance
      */
-    void destroySynapseConfiguration();
+    void destroySynapseConfiguration(boolean preserveState);
 
     /**
      * Returns underlying environment context
