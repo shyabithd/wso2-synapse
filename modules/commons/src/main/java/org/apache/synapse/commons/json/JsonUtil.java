@@ -73,6 +73,8 @@ public final class JsonUtil {
      */
     public static final String PRESERVE_JSON_STREAM = "preserve.json.stream";
 
+    private static boolean isJsonToXmlPiEnabled = false;
+
     /// JSON/XML INPUT OUTPUT Formatting Configuration
     // TODO: Build thie configuration from a "json.properties" file. Add a debug log to dump() the config to the log.
     // TODO: Add another param to empty xml element to null or empty json string mapping <a/> -> "a":null or "a":""
@@ -159,7 +161,11 @@ public final class JsonUtil {
             process = properties.getProperty
                     (Constants.SYNAPSE_COMMONS_JSON_OUTPUT_EMPTY_XML_ELEM_TO_EMPTY_STR, "true").trim();
 
-            xmlNilReadWriteEnabled = Boolean.parseBoolean(properties.getProperty("synapse.commons.enableXmlNilReadWrite", "false"));
+            isJsonToXmlPiEnabled = Boolean.parseBoolean(properties.getProperty
+                    (Constants.SYNAPSE_JSON_TO_XML_PROCESS_INSTRUCTION_ENABLE, "false").trim());
+
+            xmlNilReadWriteEnabled = Boolean.parseBoolean(
+                    properties.getProperty("synapse.commons.enableXmlNilReadWrite", "false"));
 
         }
     }
@@ -1179,5 +1185,14 @@ public final class JsonUtil {
             isRequired = false;
         }
         return isRequired;
+    }
+
+    /**
+     * Returns the configured value of the parameter (synapse.json.to.xml.process.instruction.enabled).
+     *
+     * @return true to inform staxon library to add PIs to JSON -> XML conversion
+     */
+    public static boolean isPiEnabled() {
+        return isJsonToXmlPiEnabled;
     }
 }
