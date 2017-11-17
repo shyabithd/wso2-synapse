@@ -251,9 +251,9 @@ public class TargetRequestFactory {
      * @param contentType
      * @return true for multipart content types
      */
-    private static boolean isMultipartContent(String contentType) {
-        if (HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA.equals(contentType) || HTTPConstants
-                .HEADER_ACCEPT_MULTIPART_RELATED.equals(contentType)) {
+    public static boolean isMultipartContent(String contentType) {
+        if (contentType.contains(HTTPConstants.MEDIA_TYPE_MULTIPART_FORM_DATA)
+            || contentType.contains(HTTPConstants.HEADER_ACCEPT_MULTIPART_RELATED)) {
             return true;
         }
         return false;
