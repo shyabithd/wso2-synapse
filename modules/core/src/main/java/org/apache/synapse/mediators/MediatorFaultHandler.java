@@ -32,6 +32,7 @@ import org.apache.synapse.aspects.flow.statistics.collectors.FaultStatisticColle
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
 import org.apache.synapse.continuation.ContinuationStackManager;
 import org.apache.synapse.mediators.base.SequenceMediator;
+import org.apache.synapse.util.ConcurrencyThrottlingUtils;
 import org.apache.synapse.util.MessageHelper;
 
 /**
@@ -90,6 +91,8 @@ public class MediatorFaultHandler extends FaultHandler {
         if (traceOrDebugOn) {
             traceOrDebugWarn(traceOn, "Executing fault handler mediator : " + name);
         }
+
+        ConcurrencyThrottlingUtils.decrementConcurrencyThrottleAccessController(synCtx);
 
         synCtx.getServiceLog().warn("Executing fault sequence mediator : " + name);
         this.faultMediator.mediate(synCtx);
