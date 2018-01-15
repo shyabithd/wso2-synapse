@@ -122,7 +122,10 @@ public class SynapseJsonPath extends SynapsePath {
         } catch (IOException e) {
             handleException("Error evaluating JSON Path <" + jsonPath.getPath() + ">", e);
         } catch (Exception e) { // catch invalid json paths that do not match with the existing JSON payload.
-            log.error("#stringValueOf. Error evaluating JSON Path <" + jsonPath.getPath() + ">. Returning empty result. Error>>> " + e.getLocalizedMessage());
+            if (log.isDebugEnabled()) {
+                log.debug("#stringValueOf. Error evaluating JSON Path <" + jsonPath.getPath()
+                        + ">. Returning empty result. Error>>> " + e.getLocalizedMessage());
+            }
             return "";
         }
         if (log.isDebugEnabled()) {
