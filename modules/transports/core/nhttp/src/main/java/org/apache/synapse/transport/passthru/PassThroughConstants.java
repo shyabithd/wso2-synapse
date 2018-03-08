@@ -212,4 +212,7 @@ public class PassThroughConstants {
 
     public static final String MESSAGE_SIZE_VALIDATION_SUM = "MESSAGE_SIZE_VALIDATION_SUM";
     public static final String SOURCE_CONNECTION_DROPPED = "SOURCE_CONNECTION_DROPPED";
+
+    //Validate the bad formed xml message by building the whole xml document.
+    public static final String FORCE_XML_MESSAGE_VALIDATION = "force.xml.message.validation";
 }
