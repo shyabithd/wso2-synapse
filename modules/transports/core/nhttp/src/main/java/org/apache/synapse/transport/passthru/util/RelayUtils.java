@@ -68,8 +68,7 @@ public class RelayUtils {
             // this to keep track ignore the builder operation eventhough
             // content level is enable.
         }
-        forceXmlValidation = PassThroughConfiguration.getInstance()
-                .getBooleanProperty(PassThroughConstants.FORCE_XML_MESSAGE_VALIDATION);
+        forceXmlValidation = PassThroughConfiguration.getInstance().isForcedXmlMessageValidationEnabled();
     }
 
     public static void buildMessage(org.apache.axis2.context.MessageContext msgCtx)
