@@ -41,6 +41,8 @@ import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 
 import javax.xml.stream.XMLStreamException;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
@@ -56,6 +58,8 @@ public class RelayUtils {
 
     private static Boolean forcePTBuild = null;
 
+    private static boolean forceXmlValidation = false;
+
     static {
         if (forcePTBuild == null) {
             forcePTBuild = PassThroughConfiguration.getInstance().getBooleanProperty(
@@ -66,6 +70,7 @@ public class RelayUtils {
             // this to keep track ignore the builder operation eventhough
             // content level is enable.
         }
+        forceXmlValidation = PassThroughConfiguration.getInstance().isForcedXmlMessageValidationEnabled();
     }
 
     public static void buildMessage(org.apache.axis2.context.MessageContext msgCtx)
@@ -111,6 +116,21 @@ public class RelayUtils {
 
     public static void builldMessage(MessageContext messageContext, boolean earlyBuild,
                                      InputStream in) throws IOException, AxisFault {
+        ByteArrayOutputStream byteArrayOutputStream = null;
+        if (forceXmlValidation) {
+            //read input stream to store raw data and create inputStream again.
+            //then the raw data can be logged after an error while building the message.
+            byteArrayOutputStream = new ByteArrayOutputStream();
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = in.read(buffer)) > -1 ) {
+                byteArrayOutputStream.write(buffer, 0, len);
+            }
+            byteArrayOutputStream.flush();
+
+            // Open new InputStreams using the recorded bytes and assign to in
+            in =  new ByteArrayInputStream(byteArrayOutputStream.toByteArray());
+        }
         //
         BufferedInputStream bufferedInputStream = (BufferedInputStream) messageContext
                 .getProperty(PassThroughConstants.BUFFERED_INPUT_STREAM);
@@ -149,9 +169,25 @@ public class RelayUtils {
 
             earlyBuild = messageContext.getProperty(PassThroughConstants.RELAY_EARLY_BUILD) != null ? (Boolean) messageContext
                     .getProperty(PassThroughConstants.RELAY_EARLY_BUILD) : earlyBuild;
-
             if (!earlyBuild) {
                 processAddressing(messageContext);
+            }
+
+            //force validation makes sure that the xml is well formed(not having multi root element).
+            if (forceXmlValidation) {
+                try {
+                    messageContext.getEnvelope().buildWithAttachments();
+                    if (messageContext.getEnvelope().getBody().getFirstElement() != null) {
+                        messageContext.getEnvelope().getBody().getFirstElement().buildNext();
+                    }
+                } catch (Exception e) {
+                    if (byteArrayOutputStream != null) {
+                        String rawData = byteArrayOutputStream.toString();
+                        log.error("Error while building the message.\n" + rawData);
+                        messageContext.setProperty(PassThroughConstants.RAW_PAYLOAD, rawData);
+                    }
+                    throw e;
+                }
             }
         }
         return;
