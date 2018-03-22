@@ -20,6 +20,7 @@
 package org.apache.synapse.mediators.transform;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.soap.SOAPEnvelope;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axiom.soap.SOAPHeader;
@@ -231,7 +232,13 @@ public class HeaderMediator extends AbstractMediator {
             hb.setText(value);
         } else if (hasEmbeddedXml()) {
             for (OMElement e : embeddedXmlContent) {
-                header.addChild(e.cloneOMElement());
+                try {
+                    OMElement clonedElement = e.cloneOMElement();
+                    header.addChild(ElementHelper.toSOAPHeaderBlock(clonedElement, fac));
+                } catch (Exception exc) {
+                    log.error("Error occurred while transforming the OMElement to SOAPHeaderBlock ", exc);
+                }
+
             }
         } else {
             // header mediator has an implicit xml element but its content cannot be found.
