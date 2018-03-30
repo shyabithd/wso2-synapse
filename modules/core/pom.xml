@@ -306,7 +306,11 @@
             <artifactId>derby</artifactId>
             <scope>test</scope>
         </dependency>
-	</dependencies>
+        <dependency>
+            <groupId>jcifs.wso2</groupId>
+            <artifactId>jcifs</artifactId>
+        </dependency>
+    </dependencies>
 <properties>
 		<version.orbit.rabbitmq>3.6.6.wso2v1</version.orbit.rabbitmq>
 	</properties>
