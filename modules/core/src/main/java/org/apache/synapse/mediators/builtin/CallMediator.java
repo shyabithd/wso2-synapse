@@ -19,7 +19,15 @@
 
 package org.apache.synapse.mediators.builtin;
 
+import org.apache.axiom.om.OMAbstractFactory;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMException;
+import org.apache.axiom.om.OMNode;
+import org.apache.axiom.om.util.ElementHelper;
+import org.apache.axiom.soap.SOAP11Constants;
+import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SequenceType;
@@ -31,6 +39,7 @@ import org.apache.synapse.aspects.flow.statistics.StatisticIdentityGenerator;
 import org.apache.synapse.aspects.flow.statistics.data.artifact.ArtifactHolder;
 import org.apache.synapse.continuation.ContinuationStackManager;
 import org.apache.synapse.core.SynapseEnvironment;
+import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -42,6 +51,9 @@ import org.apache.synapse.message.senders.blocking.BlockingMsgSender;
 import org.apache.synapse.SynapseException;
 
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -89,6 +101,12 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
 
     private SynapseEnvironment synapseEnv;
 
+    private boolean initClientOptions = true;
+
+    private String clientRepository = null;
+
+    private String axis2xml = null;
+
     //State whether actual endpoint(when null) is wrapped by a default endpoint
     private boolean isWrappingEndpointCreated;
 
@@ -134,6 +152,8 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
         }
 
         MessageContext resultMsgCtx = null;
+        //set initClientOption with blockingMsgsender
+        blockingMsgSender.setInitClientOptions(initClientOptions);
         // fixing ESBJAVA-4976, if no endpoint is defined in call mediator, this is required to avoid NPEs in
         // blocking sender.
         if (endpoint == null) {
@@ -147,7 +167,11 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
             if ("true".equals(synInCtx.getProperty(SynapseConstants.OUT_ONLY))) {
                 blockingMsgSender.send(endpoint, synInCtx);
             } else {
-                resultMsgCtx = blockingMsgSender.send(endpoint, synInCtx);
+                //Cloning the message context to make blocking call to send multiple requests without loosing the context
+                MessageContext synapseOutMsgCtx = MessageHelper.cloneMessageContext(synInCtx);
+                setSoapHeaderBlock(synapseOutMsgCtx);
+                setNTLMOptions(synInCtx, synapseOutMsgCtx);
+                resultMsgCtx = blockingMsgSender.send(endpoint, synapseOutMsgCtx);
                 if ("true".equals(resultMsgCtx.getProperty(SynapseConstants.BLOCKING_SENDER_ERROR))) {
                     handleFault(synInCtx, (Exception) resultMsgCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
                 }
@@ -279,7 +303,8 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
         if (blocking) {
             try {
                 configCtx = ConfigurationContextFactory.createConfigurationContextFromFileSystem(
-                        DEFAULT_CLIENT_REPO, DEFAULT_AXIS2_XML);
+                        clientRepository != null ? clientRepository : DEFAULT_CLIENT_REPO,
+                        axis2xml != null ? axis2xml : DEFAULT_AXIS2_XML);
                 blockingMsgSender = new BlockingMsgSender();
                 blockingMsgSender.setConfigurationContext(configCtx);
                 blockingMsgSender.init();
@@ -312,6 +337,47 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
 
     public void setBlocking(boolean blocking) {
         this.blocking = blocking;
+    }
+
+    public boolean getInitClientOptions() {
+        return initClientOptions;
+    }
+
+    public void setInitClientOptions(boolean initClientOptions) {
+        this.initClientOptions = initClientOptions;
+    }
+
+    public String getClientRepository() {
+        return clientRepository;
+    }
+
+    public void setClientRepository(String clientRepository) {
+        this.clientRepository = clientRepository;
+    }
+
+    public String getAxis2xml() {
+        return axis2xml;
+    }
+
+    public void setAxis2xml(String axis2xml) {
+        this.axis2xml = axis2xml;
+    }
+
+    /**
+     * This sets NTLM specific options from original message context to the cloned message context.
+     * @param synCtx Original message context
+     * @param clonedSynCtx Cloned message context
+     */
+    private void setNTLMOptions(MessageContext synCtx, MessageContext clonedSynCtx) {
+        org.apache.axis2.context.MessageContext axis2MsgCtx =
+                ((Axis2MessageContext)synCtx).getAxis2MessageContext();
+        org.apache.axis2.context.MessageContext clonedAxis2MsgCtx =
+                ((Axis2MessageContext)clonedSynCtx).getAxis2MessageContext();
+        clonedAxis2MsgCtx.getOptions().setProperty(
+                HTTPConstants.AUTHENTICATE, axis2MsgCtx.getOptions().getProperty(HTTPConstants.AUTHENTICATE));
+        clonedAxis2MsgCtx.getOptions().setProperty(
+                HTTPConstants.MULTITHREAD_HTTP_CONNECTION_MANAGER,
+                axis2MsgCtx.getOptions().getProperty(HTTPConstants.MULTITHREAD_HTTP_CONNECTION_MANAGER));
     }
 
     private void handleFault(MessageContext synCtx, Exception ex) {
@@ -367,4 +433,37 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
         StatisticIdentityGenerator.reportingEndEvent(cloneId, ComponentType.MEDIATOR, holder);
     }
 
+    /**
+     * This sets soap headers to a message context in order to support WS-Addressing
+     * @param synCtx MessageContext
+     */
+    private void setSoapHeaderBlock(MessageContext synCtx) {
+        if (synCtx.getEnvelope().getHeader() != null) {
+            Iterator iHeader = synCtx.getEnvelope().getHeader().getChildren();
+            SOAPFactory fac;
+            if (SOAP11Constants.SOAP_ENVELOPE_NAMESPACE_URI.equals(synCtx.getEnvelope().getBody()
+                    .getNamespace().getNamespaceURI())) {
+                fac = OMAbstractFactory.getSOAP11Factory();
+            } else {
+                fac = OMAbstractFactory.getSOAP12Factory();
+            }
+            List<OMNode> newHeaderNodes = new ArrayList<OMNode>();
+            while (iHeader.hasNext()) {
+                try {
+                    Object element = iHeader.next();
+                    if (element instanceof OMElement) {
+                        newHeaderNodes.add(ElementHelper.toSOAPHeaderBlock((OMElement) element, fac).cloneOMElement());
+                    }
+                    iHeader.remove();
+                } catch (OMException e) {
+                    log.error("Unable to convert to SoapHeader Block", e);
+                } catch (Exception e) {
+                    log.error("Unable to convert to SoapHeader Block", e);
+                }
+            }
+            for (OMNode newHeaderNode : newHeaderNodes) {
+                synCtx.getEnvelope().getHeader().addChild(newHeaderNode);
+            }
+        }
+    }
 }
