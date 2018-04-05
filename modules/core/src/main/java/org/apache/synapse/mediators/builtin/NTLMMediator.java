@@ -189,7 +189,6 @@ public class NTLMMediator extends AbstractMediator implements ManagedLifecycle {
         if (log.isDebugEnabled()) {
             log.debug("[NTLMMediator] Init method Invoked.");
         }
-        log.info("[NTLMMediator] Init method Invoked.");
         //Register the custom NTLM authenticator as an Auth Scheme in HttpClient and set the encoding
         //property of the JCICF lib to ASCII.
         jcifs.Config.setProperty("jcifs.encoding", "ASCII");
