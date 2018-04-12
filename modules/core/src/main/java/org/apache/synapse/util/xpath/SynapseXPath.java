@@ -19,7 +19,10 @@
 
 package org.apache.synapse.util.xpath;
 
-import org.apache.axiom.om.*;
+import org.apache.axiom.om.OMAttribute;
+import org.apache.axiom.om.OMElement;
+import org.apache.axiom.om.OMFactory;
+import org.apache.axiom.om.OMNamespace;
 import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.axiom.om.impl.dom.DOOMAbstractFactory;
 import org.apache.axiom.om.impl.llom.OMDocumentImpl;
@@ -40,7 +43,11 @@ import org.apache.synapse.util.streaming_xpath.StreamingXPATH;
 import org.apache.synapse.util.streaming_xpath.compiler.exception.StreamingXPATHCompilerException;
 import org.apache.synapse.util.streaming_xpath.custom.components.ParserComponent;
 import org.apache.synapse.util.streaming_xpath.exception.StreamingXPATHException;
-import org.jaxen.*;
+import org.jaxen.BaseXPath;
+import org.jaxen.Context;
+import org.jaxen.ContextSupport;
+import org.jaxen.JaxenException;
+import org.jaxen.UnresolvableException;
 import org.jaxen.util.SingletonList;
 
 import javax.xml.namespace.QName;
@@ -51,8 +58,10 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 import java.io.IOException;
 import java.io.InputStream;
-
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 
 
@@ -314,13 +323,26 @@ public class SynapseXPath extends SynapsePath {
                     if (o instanceof OMTextImpl) {
                         textValue.append(((OMTextImpl) o).getText());
                     } else if (o instanceof OMElementImpl) {
-                        String s = ((OMElementImpl) o).getText();
+                        if (list.size() == 1) {
+                            String s = ((OMElementImpl) o).getText();
 
-                        // We use StringUtils.trim as String.trim does not remove U+00A0 (int 160) (No-break space)
-                        if (s.replace(String.valueOf((char) 160), " ").trim().length() == 0) {
-                            s = o.toString();
+                            // We use StringUtils.trim as String.trim does not remove U+00A0 (int 160) (No-break space)
+                            if (s.replace(String.valueOf((char) 160), " ").trim().length() == 0) {
+                                s = o.toString();
+                            }
+                            textValue.append(s);
+                        } else {
+                            String tmp = ((OMElementImpl) o).getText();
+                            String trimmedText = tmp.replace(String.valueOf((char) 160), " ").trim();
+                            String s = o.toString();
+                            s = s.replace(tmp, trimmedText);
+                            // We use StringUtils.trim as String.trim does not remove U+00A0 (int 160) (No-break space)
+                            if (trimmedText.length() == 0) {
+                                s = o.toString();
+                            }
+                            textValue.append(s);
                         }
-                        textValue.append(s);
+
 
                     } else if (o instanceof OMDocumentImpl) {
 
