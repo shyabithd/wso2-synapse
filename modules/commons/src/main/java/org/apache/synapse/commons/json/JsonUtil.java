@@ -604,7 +604,15 @@ public final class JsonUtil {
             if (e != null) {
                 SOAPBody b = e.getBody();
                 if (b != null) {
-                    removeIndentations(b);
+                    try {
+                        removeIndentations(b);
+                    } catch (Exception exp) {
+                        // This means json payload is malformed.
+                        // ignoring the json payload
+                        logger.warn("Existing json payload is malformed. Discarding the existing json payload. MessageID : " +
+                                messageContext.getMessageID(), exp);
+                        return null;
+                    }
                     Iterator children = b.getChildren();
                     while (children.hasNext()) {
                         Object o = children.next();
