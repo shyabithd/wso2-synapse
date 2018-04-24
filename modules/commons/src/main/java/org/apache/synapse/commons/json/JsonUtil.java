@@ -602,10 +602,10 @@ public final class JsonUtil {
             }
             SOAPEnvelope e = messageContext.getEnvelope();
             if (e != null) {
-                SOAPBody b = e.getBody();
-                if (b != null) {
+                SOAPBody body = e.getBody();
+                if (body != null) {
                     try {
-                        removeIndentations(b);
+                        removeIndentations(body);
                     } catch (Exception exp) {
                         // This means json payload is malformed.
                         // ignoring the json payload
@@ -613,7 +613,7 @@ public final class JsonUtil {
                                 messageContext.getMessageID(), exp);
                         return null;
                     }
-                    Iterator children = b.getChildren();
+                    Iterator children = body.getChildren();
                     while (children.hasNext()) {
                         Object o = children.next();
                         if (o instanceof OMNode) {
@@ -626,7 +626,7 @@ public final class JsonUtil {
                                      messageContext.getMessageID());
                     }
                     if (addAsNewFirstChild) {
-                        b.addChild(elem);
+                        body.addChild(elem);
                         if (logger.isTraceEnabled()) {
                             logger.trace(
                                     "#getNewJsonPayload. Added the new JSON sourced element as the first child. MessageID: " +
