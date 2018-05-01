@@ -271,22 +271,24 @@ public class Axis2Sender {
 
     private static String constructErrorMessage(MessageContext msgContext) {
         StringBuilder sb = new StringBuilder();
-        sb.append("Unexpected error sending message back ");
+        sb.append("Unexpected error sending message back. ");
         try {
 
             String strEndpoint = (String) msgContext.getProperty(NhttpConstants.ENDPOINT_PREFIX);
             if (strEndpoint != null) {
-                sb.append(strEndpoint + ", ");
+                sb.append(strEndpoint)
+                        .append(", ");
             }
             Map<String, Object> mHeader = (Map<String, Object>) msgContext.getProperty
-                    (org.apache.axis2.context.MessageContext.TRANSPORT_HEADERS);
+                    (MessageContext.TRANSPORT_HEADERS);
             if (mHeader != null) {
                 for (String strKey : mHeader.keySet()) {
-                    sb.append(strKey + ":" + mHeader.get(strKey).toString() + ",");
+                    sb.append(strKey).append(":").append(mHeader.get(strKey).toString()).append(",");
                 }
             }
         } catch (Exception e) {
-            sb.append(" Unexpected error sending message back");
+            sb.append("Error while constructing error message ")
+                    .append(e.getMessage()).append(". ");
         }
         return sb.toString();
     }
