@@ -47,7 +47,6 @@ import org.apache.synapse.util.MessageHelper;
 import org.apache.synapse.util.POXUtils;
 
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -235,7 +234,7 @@ public class Axis2Sender {
                 AxisEngine.send(messageContext);
             }
         } catch (AxisFault e) {
-            handleException(getResponseMessage(messageContext), e);
+            handleException(constructErrorMessage(messageContext), e);
         }
     }
 
@@ -270,8 +269,9 @@ public class Axis2Sender {
         throw new SynapseException(msg, e);
     }
 
-    private static String getResponseMessage(MessageContext msgContext) {
+    private static String constructErrorMessage(MessageContext msgContext) {
         StringBuilder sb = new StringBuilder();
+        sb.append("Unexpected error sending message back ");
         try {
 
             String strEndpoint = (String) msgContext.getProperty(NhttpConstants.ENDPOINT_PREFIX);
@@ -285,8 +285,6 @@ public class Axis2Sender {
                     sb.append(strKey + ":" + mHeader.get(strKey).toString() + ",");
                 }
             }
-            sb.append(msgContext.getEnvelope().toString());
-            sb.append(" Unexpected error sending message back");
         } catch (Exception e) {
             sb.append(" Unexpected error sending message back");
         }
