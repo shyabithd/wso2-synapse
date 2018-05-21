@@ -44,6 +44,7 @@ import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.AbstractEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
+import org.apache.synapse.endpoints.TemplateEndpoint;
 import org.apache.synapse.message.MessageConsumer;
 import org.apache.synapse.message.processor.MessageProcessor;
 import org.apache.synapse.message.processor.MessageProcessorConstants;
@@ -430,6 +431,11 @@ public class ForwardingService implements Task, ManagedLifecycle {
 
 		if (targetEndpoint != null) {
 			Endpoint ep = messageContext.getEndpoint(targetEndpoint);
+			//If the Endpoint is a template endpoint, real endpoint details are required to
+			// get the correct endpoint definition
+			if (ep instanceof TemplateEndpoint) {
+				ep = ((TemplateEndpoint) ep).getRealEndpoint();
+			}
 			AbstractEndpoint abstractEndpoint = (AbstractEndpoint) ep;
 			EndpointDefinition endpointDefinition = abstractEndpoint.getDefinition();
 			String endpointReferenceValue = null;
