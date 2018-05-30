@@ -41,8 +41,14 @@ import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.template.TemplateMediator;
+import org.apache.synapse.rest.RESTConstants;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+import java.util.Stack;
 
 /**
  * This is the MessageContext implementation that synapse uses almost all the time because Synapse
@@ -511,17 +517,21 @@ public class Axis2MessageContext implements MessageContext {
         if (serviceLog != null) {
             return serviceLog;
         } else {
+            String serviceLoggerName = SynapseConstants.SERVICE_LOGGER_PREFIX.substring(0,
+                    SynapseConstants.SERVICE_LOGGER_PREFIX.length() - 1);
             String serviceName = (String) getProperty(SynapseConstants.PROXY_SERVICE);
-            if (serviceName != null && synCfg.getProxyService(serviceName) != null) {
-                serviceLog = LogFactory.getLog(
-                        SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName);
-                return serviceLog;
+            if (serviceName != null) {
+                if (synCfg.getProxyService(serviceName) != null) {
+                    serviceLoggerName = SynapseConstants.SERVICE_LOGGER_PREFIX + serviceName;
+                }
             } else {
-                serviceLog = LogFactory.getLog(
-                        SynapseConstants.SERVICE_LOGGER_PREFIX.substring(0,
-                                                                         SynapseConstants.SERVICE_LOGGER_PREFIX.length() - 1));
-                return serviceLog;
+                serviceName = (String) getProperty(RESTConstants.SYNAPSE_REST_API);
+                if (serviceName != null && synCfg.getAPI(serviceName) != null) {
+                    serviceLoggerName = SynapseConstants.API_LOGGER_PREFIX + serviceName;
+                }
             }
+            serviceLog = LogFactory.getLog(serviceLoggerName);
+            return serviceLog;
         }
     }
 
