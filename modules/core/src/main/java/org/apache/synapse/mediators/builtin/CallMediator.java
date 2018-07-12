@@ -27,11 +27,14 @@ import org.apache.axiom.om.util.ElementHelper;
 import org.apache.axiom.soap.SOAP11Constants;
 import org.apache.axiom.soap.SOAPFactory;
 import org.apache.axis2.AxisFault;
+import org.apache.axis2.context.ConfigurationContext;
+import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.axis2.transport.http.HTTPConstants;
 import org.apache.synapse.ManagedLifecycle;
 import org.apache.synapse.MessageContext;
 import org.apache.synapse.SequenceType;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseLog;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.ComponentType;
@@ -48,7 +51,6 @@ import org.apache.synapse.util.MessageHelper;
 import org.apache.axis2.context.ConfigurationContext;
 import org.apache.axis2.context.ConfigurationContextFactory;
 import org.apache.synapse.message.senders.blocking.BlockingMsgSender;
-import org.apache.synapse.SynapseException;
 
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -167,11 +169,7 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
             if ("true".equals(synInCtx.getProperty(SynapseConstants.OUT_ONLY))) {
                 blockingMsgSender.send(endpoint, synInCtx);
             } else {
-                //Cloning the message context to make blocking call to send multiple requests without loosing the context
-                MessageContext synapseOutMsgCtx = MessageHelper.cloneMessageContext(synInCtx);
-                setSoapHeaderBlock(synapseOutMsgCtx);
-                setNTLMOptions(synInCtx, synapseOutMsgCtx);
-                resultMsgCtx = blockingMsgSender.send(endpoint, synapseOutMsgCtx);
+                resultMsgCtx = blockingMsgSender.send(endpoint, synInCtx);
                 if ("true".equals(resultMsgCtx.getProperty(SynapseConstants.BLOCKING_SENDER_ERROR))) {
                     handleFault(synInCtx, (Exception) resultMsgCtx.getProperty(SynapseConstants.ERROR_EXCEPTION));
                 }
@@ -363,22 +361,6 @@ public class CallMediator extends AbstractMediator implements ManagedLifecycle {
         this.axis2xml = axis2xml;
     }
 
-    /**
-     * This sets NTLM specific options from original message context to the cloned message context.
-     * @param synCtx Original message context
-     * @param clonedSynCtx Cloned message context
-     */
-    private void setNTLMOptions(MessageContext synCtx, MessageContext clonedSynCtx) {
-        org.apache.axis2.context.MessageContext axis2MsgCtx =
-                ((Axis2MessageContext)synCtx).getAxis2MessageContext();
-        org.apache.axis2.context.MessageContext clonedAxis2MsgCtx =
-                ((Axis2MessageContext)clonedSynCtx).getAxis2MessageContext();
-        clonedAxis2MsgCtx.getOptions().setProperty(
-                HTTPConstants.AUTHENTICATE, axis2MsgCtx.getOptions().getProperty(HTTPConstants.AUTHENTICATE));
-        clonedAxis2MsgCtx.getOptions().setProperty(
-                HTTPConstants.MULTITHREAD_HTTP_CONNECTION_MANAGER,
-                axis2MsgCtx.getOptions().getProperty(HTTPConstants.MULTITHREAD_HTTP_CONNECTION_MANAGER));
-    }
 
     private void handleFault(MessageContext synCtx, Exception ex) {
         synCtx.setProperty(SynapseConstants.SENDING_FAULT, Boolean.TRUE);
