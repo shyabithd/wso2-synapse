@@ -152,53 +152,53 @@ public class RelayUtils {
 
         OMElement element = null;
         try {
-            element = messageBuilder.getDocument(messageContext,
-                    bufferedInputStream != null ? bufferedInputStream : in);
+            element = messageBuilder.getDocument(messageContext, bufferedInputStream != null ? bufferedInputStream : in);
+            if (element != null) {
+                messageContext.setEnvelope(TransportUtils.createSOAPEnvelope(element));
+                messageContext.setProperty(DeferredMessageBuilder.RELAY_FORMATTERS_MAP,
+                                           messageBuilder.getFormatters());
+                messageContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
+
+                earlyBuild = messageContext.getProperty(PassThroughConstants.RELAY_EARLY_BUILD) != null ? (Boolean) messageContext
+                        .getProperty(PassThroughConstants.RELAY_EARLY_BUILD) : earlyBuild;
+                if (!earlyBuild) {
+                    processAddressing(messageContext);
+                }
+
+                //force validation makes sure that the xml is well formed (not having multi root element), and the json
+                // message is valid (not having any content after the final enclosing bracket)
+                if (forceXmlValidation || forceJSONValidation) {
+                    String rawData = null;
+                    try {
+                        String contentType = (String) messageContext.getProperty(Constants.Configuration.CONTENT_TYPE);
+
+                        if (PassThroughConstants.JSON_CONTENT_TYPE.equals(contentType) && forceJSONValidation) {
+                            rawData = byteArrayOutputStream.toString();
+                            JsonParser jsonParser = new JsonParser();
+                            jsonParser.parse(rawData);
+                        }
+
+                        messageContext.getEnvelope().buildWithAttachments();
+                        if (messageContext.getEnvelope().getBody().getFirstElement() != null) {
+                            messageContext.getEnvelope().getBody().getFirstElement().buildNext();
+                        }
+                    } catch (Exception e) {
+                        if (rawData == null) {
+                            rawData = byteArrayOutputStream.toString();
+                        }
+                        log.error("Error while building the message.\n" + rawData);
+                        messageContext.setProperty(PassThroughConstants.RAW_PAYLOAD, rawData);
+                        throw e;
+                    }
+                }
+            }
         } catch (Exception e) {
             //Clearing the buffer when there is an exception occurred.
             consumeAndDiscardMessage(messageContext);
             messageContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
             handleException("Error while building Passthrough stream", e);
         }
-        if (element != null) {
-            messageContext.setEnvelope(TransportUtils.createSOAPEnvelope(element));
-            messageContext.setProperty(DeferredMessageBuilder.RELAY_FORMATTERS_MAP,
-                    messageBuilder.getFormatters());
-            messageContext.setProperty(PassThroughConstants.MESSAGE_BUILDER_INVOKED, Boolean.TRUE);
 
-            earlyBuild = messageContext.getProperty(PassThroughConstants.RELAY_EARLY_BUILD) != null ? (Boolean) messageContext
-                    .getProperty(PassThroughConstants.RELAY_EARLY_BUILD) : earlyBuild;
-            if (!earlyBuild) {
-                processAddressing(messageContext);
-            }
-
-            //force validation makes sure that the xml is well formed (not having multi root element), and the json
-            // message is valid (not having any content after the final enclosing bracket)
-            if (forceXmlValidation || forceJSONValidation) {
-                String rawData = null;
-                try {
-                    String contentType = (String) messageContext.getProperty(Constants.Configuration.CONTENT_TYPE);
-
-                    if (PassThroughConstants.JSON_CONTENT_TYPE.equals(contentType) && forceJSONValidation) {
-                        rawData = byteArrayOutputStream.toString();
-                        JsonParser jsonParser = new JsonParser();
-                        jsonParser.parse(rawData);
-                    }
-
-                    messageContext.getEnvelope().buildWithAttachments();
-                    if (messageContext.getEnvelope().getBody().getFirstElement() != null) {
-                        messageContext.getEnvelope().getBody().getFirstElement().buildNext();
-                    }
-                } catch (Exception e) {
-                    if (rawData == null) {
-                        rawData = byteArrayOutputStream.toString();
-                    }
-                    log.error("Error while building the message.\n" + rawData);
-                    messageContext.setProperty(PassThroughConstants.RAW_PAYLOAD, rawData);
-                    throw e;
-                }
-            }
-        }
         return;
     }
 
