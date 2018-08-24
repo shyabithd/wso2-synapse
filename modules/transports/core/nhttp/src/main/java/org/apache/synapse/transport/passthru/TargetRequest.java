@@ -452,5 +452,9 @@ public class TargetRequest {
     public HttpRoute getRoute(){
         return route;
     }
+
+    public Pipe getPipe() {
+        return pipe;
+    }
     
 }
