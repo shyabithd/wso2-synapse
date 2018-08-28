@@ -21,7 +21,7 @@ package org.apache.synapse.transport.passthru.config;
 
 /**
  * This class holds the parameters related to control the connection removal.
- * <p>
+ *
  * Scenario:
  * This issue happens when calling salesforce endpoint with keepalive connections. First ESB create the connection with
  * salesforce and send the request and get the response. However if the connection is idle for 1min and ESB used the 1min
