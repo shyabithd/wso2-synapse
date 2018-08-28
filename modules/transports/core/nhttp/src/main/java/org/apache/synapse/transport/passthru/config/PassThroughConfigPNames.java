@@ -76,6 +76,16 @@ public interface PassThroughConfigPNames {
     public String HTTP_HEADERS_PRESERVE = "http.headers.preserve";
 
     /**
+     * Defines the time interval for idle connection removal.
+     */
+    public String CONNECTION_IDLE_TIME = "transport.sender.connection.idle.time";
+
+    /**
+     * Defines the time interval for maximum connection lifespan.
+     */
+    public String MAXIMUM_CONNECTION_LIFESPAN = "transport.sender.connection.maximum.lifespan";
+
+    /**
      * Defines whether HTTP keep-alive is disabled
      */
     public String DISABLE_KEEPALIVE = "http.connection.disable.keepalive";
