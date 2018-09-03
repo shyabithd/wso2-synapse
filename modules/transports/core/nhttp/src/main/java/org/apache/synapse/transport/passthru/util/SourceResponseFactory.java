@@ -29,6 +29,7 @@ import org.apache.synapse.transport.passthru.PassThroughConstants;
 import org.apache.synapse.transport.passthru.Pipe;
 import org.apache.synapse.transport.passthru.SourceRequest;
 import org.apache.synapse.transport.passthru.SourceResponse;
+import org.apache.synapse.transport.passthru.config.PassThroughConfiguration;
 import org.apache.synapse.transport.passthru.config.SourceConfiguration;
 
 import com.ibm.wsdl.extensions.http.HTTPConstants;
@@ -123,11 +124,10 @@ public class SourceResponseFactory {
 			}
 		}
 	}
-		// keep alive
-		String noKeepAlie = (String) msgContext
-				.getProperty(PassThroughConstants.NO_KEEPALIVE);
-		if ("true".equals(noKeepAlie)) {
-			sourceResponse.setKeepAlive(false);
+        // keep alive
+        String noKeepAlive = (String) msgContext.getProperty(PassThroughConstants.NO_KEEPALIVE);
+        if ("true".equals(noKeepAlive) || PassThroughConfiguration.getInstance().isKeepAliveDisabled()) {
+            sourceResponse.setKeepAlive(false);
         } else {
             // If the payload is delayed for GET/HEAD/DELETE, http-core-nio will start processing request, without
             // waiting for the payload. Therefore the delayed payload will be appended to the next request. To avoid
