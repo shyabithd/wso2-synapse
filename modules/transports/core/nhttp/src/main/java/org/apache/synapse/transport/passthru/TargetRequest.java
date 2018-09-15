@@ -47,7 +47,6 @@ import org.apache.synapse.transport.passthru.util.PassThroughTransportUtils;
 import org.apache.synapse.transport.passthru.util.RelayUtils;
 import org.apache.synapse.transport.passthru.util.TargetRequestFactory;
 
-import javax.xml.stream.XMLStreamException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -58,6 +57,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import javax.xml.stream.XMLStreamException;
 
 /**
  * This is a class for representing a request to be sent to a target.
@@ -172,33 +172,17 @@ public class TargetRequest {
 				}
 				headers.remove(HTTP.CONTENT_TYPE);
 			}
-		}        
-        
-        
-		Object o = requestMsgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
-		if (o != null && o instanceof TreeMap) {
-			Map _headers = (Map) o;
-			String trpContentType = (String) _headers.get(HTTP.CONTENT_TYPE);
-			if (trpContentType != null && !trpContentType.equals("")) {
-				if (!TargetRequestFactory.isMultipartContent(trpContentType)) {
-					addHeader(HTTP.CONTENT_TYPE, trpContentType);
-				}
-                //If the boundary is already set in the message context, the header specified in the message context
-                // should be added.
-                // Addresses both ESBJAVA-3182 and EI-1329
-                else {
-                    if (trpContentType.contains("boundary=")) {
-                        addHeader(HTTP.CONTENT_TYPE, trpContentType);
-                    }
-                }
-
-			}
-
 		}
-        
-        
-  
-                                                            
+
+        Object transportHeaderProperty = requestMsgCtx.getProperty(MessageContext.TRANSPORT_HEADERS);
+        if (transportHeaderProperty instanceof TreeMap) {
+            Map headers = (Map) transportHeaderProperty;
+            String trpContentType = (String) headers.get(HTTP.CONTENT_TYPE);
+            if (!("".equals(trpContentType)) && !TargetRequestFactory.isMultipartContent(trpContentType)) {
+                addHeader(HTTP.CONTENT_TYPE, trpContentType);
+            }
+        }
+
         if (hasEntityBody) {
             request = new BasicHttpEntityEnclosingRequest(method, path,
                     version != null ? version : HttpVersion.HTTP_1_1);
