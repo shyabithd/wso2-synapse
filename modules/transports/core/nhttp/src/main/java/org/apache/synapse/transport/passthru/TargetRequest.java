@@ -178,7 +178,8 @@ public class TargetRequest {
         if (transportHeaderProperty instanceof TreeMap) {
             Map headers = (Map) transportHeaderProperty;
             String trpContentType = (String) headers.get(HTTP.CONTENT_TYPE);
-            if (!("".equals(trpContentType)) && !TargetRequestFactory.isMultipartContent(trpContentType)) {
+            if (trpContentType != null && !trpContentType.equals("") && !TargetRequestFactory.isMultipartContent
+                    (trpContentType)) {
                 addHeader(HTTP.CONTENT_TYPE, trpContentType);
             }
         }
