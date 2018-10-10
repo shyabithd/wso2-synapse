@@ -23,6 +23,7 @@ import org.apache.synapse.Mediator;
 import org.apache.synapse.commons.evaluators.Evaluator;
 import org.apache.synapse.commons.evaluators.EvaluatorException;
 import org.apache.synapse.commons.evaluators.config.EvaluatorFactoryFinder;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.transform.url.URLRewriteMediator;
 import org.apache.synapse.mediators.transform.url.RewriteRule;
 import org.apache.synapse.mediators.transform.url.RewriteAction;
@@ -82,7 +83,8 @@ public class URLRewriteMediatorFactory extends AbstractMediatorFactory {
     public static final String FRAGMENT_REF = "ref";
     public static final String FRAGMENT_FULL_URI = "full";
 
-    protected Mediator createSpecificMediator(OMElement element, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement element, Properties properties,
+                                              ResolverProvider resolverProvider) {
         Iterator rules = element.getChildrenWithName(RULE_Q);
         String inputProperty = element.getAttributeValue(ATT_IN_PROPERTY);
         String outputProperty = element.getAttributeValue(ATT_OUT_PROPERTY);

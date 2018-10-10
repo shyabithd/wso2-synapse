@@ -30,6 +30,7 @@ import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.TemplateMediatorSerializer;
 import org.apache.synapse.config.xml.endpoints.TemplateSerializer;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
 
@@ -81,8 +82,10 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
                 element = artifactConfig.getFirstChildWithName(
                         new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
                 if (element != null) {
+                    ResolverProvider resolverProvider = new ResolverProvider();
+                    resolverProvider.registerResolvers();
                     Mediator mediator = MediatorFactoryFinder.getInstance().
-                            getMediator(artifactConfig, properties);
+                            getMediator(artifactConfig, properties, resolverProvider);
                     if (mediator instanceof TemplateMediator) {
                         TemplateMediator tm = (TemplateMediator) mediator;
 
@@ -163,8 +166,10 @@ public class TemplateDeployer extends AbstractSynapseArtifactDeployer {
                 element = artifactConfig.getFirstChildWithName(
                         new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
                 if (element != null) {
+                    ResolverProvider resolverProvider = new ResolverProvider();
+                    resolverProvider.registerResolvers();
                     Mediator mediator = MediatorFactoryFinder.getInstance().
-                            getMediator(artifactConfig, properties);
+                            getMediator(artifactConfig, properties, resolverProvider);
                     if (mediator instanceof TemplateMediator) {
                         TemplateMediator tm = (TemplateMediator) mediator;
 

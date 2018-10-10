@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
@@ -54,9 +55,11 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
         }
 
         try {
+            ResolverProvider resolverProvider = new ResolverProvider();
+            resolverProvider.registerResolvers();
             MediatorFactoryFinder.getInstance().setSynapseLibraryMap(getSynapseConfiguration().getSynapseLibraries());
             Mediator m = MediatorFactoryFinder.getInstance().getMediator(
-                    artifactConfig, properties);
+                    artifactConfig, properties, resolverProvider);
             if (m instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) m;
                 seq.setArtifactContainerName(customLogContent);
@@ -92,7 +95,9 @@ public class SequenceDeployer extends AbstractSynapseArtifactDeployer {
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
                                         String existingArtifactName, Properties properties) {
 
-        Mediator m = MediatorFactoryFinder.getInstance().getMediator(artifactConfig, properties);
+        ResolverProvider resolverProvider = new ResolverProvider();
+        resolverProvider.registerResolvers();
+        Mediator m = MediatorFactoryFinder.getInstance().getMediator(artifactConfig, properties, resolverProvider);
 
         CustomLogSetter.getInstance().setLogAppender((m != null) ? ((SequenceMediator) m).getArtifactContainerName() : "");
 

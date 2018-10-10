@@ -20,6 +20,7 @@
 package org.apache.synapse.config.xml.endpoints;
 
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 
@@ -44,7 +45,7 @@ public class IndirectEndpointFactory extends EndpointFactory {
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                      Properties properties) {
+                                      Properties properties, ResolverProvider resolverProvider) {
 
         IndirectEndpoint indirectEndpoint = new IndirectEndpoint();
         String ref = epConfig.getAttributeValue(new QName("key"));

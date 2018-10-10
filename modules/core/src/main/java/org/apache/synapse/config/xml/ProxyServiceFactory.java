@@ -30,6 +30,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.core.axis2.ProxyService;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.util.PolicyInfo;
@@ -75,7 +76,7 @@ public class ProxyServiceFactory {
 
     private static final Log log = LogFactory.getLog(ProxyServiceFactory.class);
 
-    public static ProxyService createProxy(OMElement elem, Properties properties) {
+    public static ProxyService createProxy(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         ProxyService proxy = null;
 
@@ -163,7 +164,7 @@ public class ProxyServiceFactory {
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "inSequence"));
                 if (inSequenceElement != null) {
                     SequenceMediator inSequenceMediator =
-                            mediatorFactory.createAnonymousSequence(inSequenceElement, properties);
+                            mediatorFactory.createAnonymousSequence(inSequenceElement, properties, resolverProvider);
                     inSequenceMediator.setSequenceType(SequenceType.PROXY_INSEQ);
                     proxy.setTargetInLineInSequence(inSequenceMediator);
                     isTargetOk = true;
@@ -178,7 +179,7 @@ public class ProxyServiceFactory {
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "outSequence"));
                 if (outSequenceElement != null) {
                     SequenceMediator outSequenceMediator =
-                            mediatorFactory.createAnonymousSequence(outSequenceElement, properties);
+                            mediatorFactory.createAnonymousSequence(outSequenceElement, properties, resolverProvider);
                     outSequenceMediator.setSequenceType(SequenceType.PROXY_OUTSEQ);
                     proxy.setTargetInLineOutSequence(outSequenceMediator);
                 }
@@ -192,7 +193,7 @@ public class ProxyServiceFactory {
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "faultSequence"));
                 if (faultSequenceElement != null) {
                     SequenceMediator faultSequenceMediator =
-                            mediatorFactory.createAnonymousSequence(faultSequenceElement, properties);
+                            mediatorFactory.createAnonymousSequence(faultSequenceElement, properties, resolverProvider);
                     faultSequenceMediator.setSequenceType(SequenceType.PROXY_FAULTSEQ);
                     proxy.setTargetInLineFaultSequence(faultSequenceMediator);
                 }
@@ -207,7 +208,7 @@ public class ProxyServiceFactory {
                         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
                 if (endpointElement != null) {
                     proxy.setTargetInLineEndpoint(EndpointFactory.getEndpointFromElement(
-                            endpointElement, true, properties));
+                            endpointElement, true, properties, resolverProvider));
                     isTargetOk = true;
                 }
             }
@@ -240,8 +241,10 @@ public class ProxyServiceFactory {
                 OMAttribute wsdlURI = wsdl.getAttribute(
                         new QName(XMLConfigConstants.NULL_NAMESPACE, "uri"));
                 if (wsdlURI != null) {
+                    String wsdlURIValue = wsdlURI.getAttributeValue();
+                    wsdlURIValue = resolverProvider.resolve(wsdlURIValue);
                     try {
-                        proxy.setWsdlURI(new URI(wsdlURI.getAttributeValue()));
+                        proxy.setWsdlURI(new URI(wsdlURIValue));
                     } catch (URISyntaxException e) {
                         String msg = "Error creating uri for proxy service wsdl";
                         log.error(msg);

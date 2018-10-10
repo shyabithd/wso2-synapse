@@ -19,6 +19,7 @@
 
 package org.apache.synapse.config.xml.endpoints;
 
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.ResolvingEndpoint;
 import org.apache.synapse.config.xml.SynapseXPathFactory;
@@ -44,7 +45,7 @@ public class ResolvingEndpointFactory extends EndpointFactory {
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                      Properties properties) {
+                                      Properties properties, ResolverProvider resolverProvider) {
 
         ResolvingEndpoint resolvingEndpoint = new ResolvingEndpoint();       
         String name = epConfig.getAttributeValue(new QName("name"));

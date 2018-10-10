@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.template.InvokeMediator;
 
@@ -54,7 +55,7 @@ public class InvokeMediatorFactory extends AbstractMediatorFactory {
     InvokeMediator invoker;
 
     @Override
-    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         invoker = new InvokeMediator();
         processAuditStatus(invoker, elem);
         OMAttribute targetTemplateAttr = elem.getAttribute(ATT_TARGET);

@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SequenceType;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.base.SequenceMediator;
 
@@ -56,7 +57,8 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         return SEQUENCE_Q;
     }
 
-    public SequenceMediator createAnonymousSequence(OMElement elem, Properties properties) {
+    public SequenceMediator createAnonymousSequence(OMElement elem, Properties properties,
+                                                    ResolverProvider resolverProvider) {
         SequenceMediator seqMediator = new SequenceMediator();
         OMAttribute e = elem.getAttribute(ATT_ONERROR);
         if (e != null) {
@@ -67,12 +69,12 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
         if (descElem != null) {
             seqMediator.setDescription(descElem.getText());
         }
-        addChildren(elem, seqMediator, properties);
+        addChildren(elem, seqMediator, properties, resolverProvider);
         seqMediator.setSequenceType(SequenceType.ANON);
         return seqMediator;
     }
     
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         SequenceMediator seqMediator = new SequenceMediator();
 
@@ -84,7 +86,7 @@ public class SequenceMediatorFactory extends AbstractListMediatorFactory {
                 seqMediator.setErrorHandler(e.getAttributeValue());
             }
             processAuditStatus(seqMediator, elem);
-            addChildren(elem, seqMediator, properties);
+            addChildren(elem, seqMediator, properties, resolverProvider);
 
         } else {
             n = elem.getAttribute(ATT_KEY);

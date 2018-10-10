@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.builtin.EnqueueMediator;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
@@ -36,7 +37,7 @@ public class EnqueueMediatorFactory extends AbstractMediatorFactory{
     public static final QName PRIORITY_ATT = new QName("priority");
     public static final QName QUEUE_ATT = new QName("executor");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         EnqueueMediator mediator = new EnqueueMediator();
         processAuditStatus(mediator, elem);
 

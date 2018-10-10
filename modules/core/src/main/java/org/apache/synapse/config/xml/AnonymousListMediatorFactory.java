@@ -23,7 +23,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMElement;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import java.util.Iterator;
 import java.util.Properties;
@@ -42,10 +42,10 @@ public abstract class AnonymousListMediatorFactory extends AbstractListMediatorF
      * @return List mediator
      */
     public static AnonymousListMediator createAnonymousListMediator(
-            OMElement el, Properties properties) {
+            OMElement el, Properties properties, ResolverProvider resolverProvider) {
         AnonymousListMediator mediator = new AnonymousListMediator();
         {
-            addChildren(el, mediator, properties);
+            addChildren(el, mediator, properties, resolverProvider);
         }
         return mediator;
     }

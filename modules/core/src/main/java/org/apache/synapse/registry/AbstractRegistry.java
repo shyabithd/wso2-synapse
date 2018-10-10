@@ -26,6 +26,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.XMLToObjectMapper;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.template.TemplateMediator;
@@ -48,7 +49,7 @@ public abstract class AbstractRegistry implements Registry {
      * @param properties bag of properties with additional information
      * @return the matching resultant object
      */
-    public Object getResource(Entry entry, Properties properties) {
+    public Object getResource(Entry entry, Properties properties, ResolverProvider resolverProvider) {
 
         OMNode omNode = null;
         RegistryEntry re = null;
@@ -139,7 +140,7 @@ public abstract class AbstractRegistry implements Registry {
         // if we have a XMLToObjectMapper for this entry, use it to convert this
         // resource into the appropriate object - e.g. sequence or endpoint
         if (entry.getMapper() != null) {
-            entry.setValue(entry.getMapper().getObjectFromOMNode(omNode, properties));
+            entry.setValue(entry.getMapper().getObjectFromOMNode(omNode, properties, resolverProvider));
 
             if (entry.getValue() instanceof SequenceMediator) {
                 SequenceMediator seq = (SequenceMediator) entry.getValue();
@@ -159,7 +160,7 @@ public abstract class AbstractRegistry implements Registry {
                 XMLToObjectMapper mapper = getMapper(re.getType());
                 if (mapper != null) {
                     entry.setMapper(mapper);
-                    entry.setValue(mapper.getObjectFromOMNode(omNode, properties));
+                    entry.setValue(mapper.getObjectFromOMNode(omNode, properties, resolverProvider));
 
                 } else {
                     entry.setValue(omNode);

@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.template.TemplateMediator;
 
 import javax.xml.namespace.QName;
@@ -50,7 +51,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
             XMLConfigConstants.SYNAPSE_NAMESPACE, "parameter");
 
 
-    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         TemplateMediator templateTemplateMediator = new TemplateMediator();
         OMAttribute nameAttr = elem.getAttribute(ATT_NAME);
         if (nameAttr != null) {
@@ -58,7 +59,7 @@ public class TemplateMediatorFactory extends AbstractListMediatorFactory {
             processAuditStatus(templateTemplateMediator, elem);
             initParameters(elem, templateTemplateMediator);
             OMElement templateBodyElem = elem.getFirstChildWithName(TEMPLATE_BODY_Q);
-            addChildren(templateBodyElem, templateTemplateMediator, properties);
+            addChildren(templateBodyElem, templateTemplateMediator, properties, resolverProvider);
         } else {
             String msg = "A EIP template should be a named mediator .";
             log.error(msg);

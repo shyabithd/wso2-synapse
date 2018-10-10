@@ -49,7 +49,8 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
         }
 
         try {
-            Entry e = EntryFactory.createEntry(artifactConfig, properties);
+            Entry e = EntryFactory.createEntry(artifactConfig, properties,
+                                               getSynapseConfiguration().getResolverProvider());
             if (e != null) {
                 /**
                  * Set the artifact container name of the local entry
@@ -88,7 +89,8 @@ public class LocalEntryDeployer extends AbstractSynapseArtifactDeployer {
         }
 
         try {
-            Entry e = EntryFactory.createEntry(artifactConfig, properties);
+            Entry e = EntryFactory.createEntry(artifactConfig, properties,
+                                               getSynapseConfiguration().getResolverProvider());
             if (e == null) {
                 handleSynapseArtifactDeploymentError("Local entry update failed. The artifact " +
                         "defined in the file: " + fileName + " is not a valid local entry.");

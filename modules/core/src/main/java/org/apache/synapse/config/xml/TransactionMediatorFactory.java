@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.transaction.TransactionMediator;
 
 import javax.xml.namespace.QName;
@@ -48,7 +49,7 @@ public class TransactionMediatorFactory extends AbstractMediatorFactory {
      * @param properties
      * @return the Transaction mediator instance created
      */
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         TransactionMediator tm = new TransactionMediator();
         OMAttribute action

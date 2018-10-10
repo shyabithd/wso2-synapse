@@ -30,6 +30,7 @@ import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCol
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.core.SynapseEnvironment;
 
 import java.util.HashMap;
@@ -45,6 +46,10 @@ public class TemplateEndpoint extends AbstractEndpoint {
     private Map<String, String> parameters = new HashMap<String, String>();
 
     private String address = null;
+
+    private ResolverProvider resolverProvider;
+
+    public TemplateEndpoint(ResolverProvider resolverProvider) { this.resolverProvider = resolverProvider; }
 
     @Override
     public void send(MessageContext synCtx) {
@@ -162,7 +167,7 @@ public class TemplateEndpoint extends AbstractEndpoint {
             if (eprTemplate != null) {
                 //create real EP if not already created or if there is any change in template
                 if (realEndpoint == null || previousEntryVersion != entry.getVersion()) {
-                    realEndpoint = eprTemplate.create(this, synCfg.getProperties());
+                    realEndpoint = eprTemplate.create(this, synCfg.getProperties(), resolverProvider);
                 }
             } else {
                 log.warn("Couldn't retrieve the endpoint template with the key:" + template);

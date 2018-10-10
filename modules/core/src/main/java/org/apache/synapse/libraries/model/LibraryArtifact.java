@@ -24,6 +24,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.deployers.SynapseArtifactDeploymentException;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.mediators.template.TemplateMediator;
@@ -187,8 +188,10 @@ public class LibraryArtifact implements SynapseArtifact{
                 String name = element.getAttributeValue(
                         new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
                 try {
+                    ResolverProvider resolverProvider = new ResolverProvider();
+                    resolverProvider.registerResolvers();
                     templateObject = MediatorFactoryFinder.getInstance().
-                            getMediator(configurationElement, properties);
+                            getMediator(configurationElement, properties, resolverProvider);
                 } catch (Exception e) {
                     String msg = "Template configuration : " + name + " cannot be built" +
                             "for Synapse Library artifact : " + LibraryArtifact.this.name;;

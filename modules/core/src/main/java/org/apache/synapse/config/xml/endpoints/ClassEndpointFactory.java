@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.ClassEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 
@@ -58,8 +59,9 @@ public class ClassEndpointFactory extends EndpointFactory {
 	    }
 	
 	    protected Endpoint createEndpoint(OMElement epConfig,
-	                                      boolean anonymousEndpoint,
-	                                      Properties properties) {
+										  boolean anonymousEndpoint,
+										  Properties properties,
+										  ResolverProvider resolverProvider) {
 	    	
 	    	ClassEndpoint clazzEndpoint = new ClassEndpoint();
 	    	OMAttribute endpointName =  epConfig.getAttribute(new QName(XMLConfigConstants.NULL_NAMESPACE,

@@ -20,6 +20,7 @@
 package org.apache.synapse.config;
 
 import org.apache.axiom.om.OMNode;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import java.util.Properties;
 
@@ -35,5 +36,5 @@ public interface XMLToObjectMapper {
      * @param properties bag of properties to pass in any information to the factory
      * @return a suitable application object
      */
-    public Object getObjectFromOMNode(OMNode om, Properties properties);
+    public Object getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider);
 }

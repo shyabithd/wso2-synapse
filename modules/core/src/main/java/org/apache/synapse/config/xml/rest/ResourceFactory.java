@@ -27,6 +27,7 @@ import org.apache.synapse.SequenceType;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.SequenceMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.rest.RESTConstants;
 import org.apache.synapse.rest.Resource;
@@ -40,14 +41,14 @@ public class ResourceFactory {
 
     private static final Log log = LogFactory.getLog(ResourceFactory.class);
 
-    public static Resource createResource(OMElement resourceElt) {
-        return createResource(resourceElt, new Properties());
+    public static Resource createResource(OMElement resourceElt, ResolverProvider resolverProvider) {
+        return createResource(resourceElt, new Properties(), resolverProvider);
     }
 
-    public static Resource createResource(OMElement resourceElt, Properties properties) {
+    public static Resource createResource(OMElement resourceElt, Properties properties, ResolverProvider resolverProvider) {
         Resource resource = new Resource();
         configureURLMappings(resource, resourceElt);
-        configureSequences(resource, resourceElt, properties);
+        configureSequences(resource, resourceElt, properties, resolverProvider);
         configureFilters(resource, resourceElt);
         return resource;
     }
@@ -96,7 +97,8 @@ public class ResourceFactory {
         }
     }
 
-    private static void configureSequences(Resource resource, OMElement resourceElt, Properties properties) {
+    private static void configureSequences(Resource resource, OMElement resourceElt, Properties properties,
+                                           ResolverProvider resolverProvider) {
         OMAttribute inSequenceKeyAtt = resourceElt.getAttribute(new QName("inSequence"));
         OMElement inSequenceElt = resourceElt.getFirstChildWithName(new QName(
                 XMLConfigConstants.SYNAPSE_NAMESPACE, "inSequence"));
@@ -104,7 +106,7 @@ public class ResourceFactory {
             resource.setInSequenceKey(inSequenceKeyAtt.getAttributeValue());
         } else if (inSequenceElt != null) {
             SequenceMediatorFactory fac = new SequenceMediatorFactory();
-            SequenceMediator sequence = fac.createAnonymousSequence(inSequenceElt, properties);
+            SequenceMediator sequence = fac.createAnonymousSequence(inSequenceElt, properties, resolverProvider);
             sequence.setSequenceType(SequenceType.API_INSEQ);
             resource.setInSequence(sequence);
         }
@@ -116,7 +118,7 @@ public class ResourceFactory {
             resource.setOutSequenceKey(outSequenceKeyAtt.getAttributeValue());
         } else if (outSequenceElt != null) {
             SequenceMediatorFactory fac = new SequenceMediatorFactory();
-            SequenceMediator sequence = fac.createAnonymousSequence(outSequenceElt, properties);
+            SequenceMediator sequence = fac.createAnonymousSequence(outSequenceElt, properties, resolverProvider);
             sequence.setSequenceType(SequenceType.API_OUTSEQ);
             resource.setOutSequence(sequence);
         }
@@ -128,7 +130,7 @@ public class ResourceFactory {
             resource.setFaultSequenceKey(faultSequenceKeyAtt.getAttributeValue());
         } else if (faultSequenceElt != null) {
             SequenceMediatorFactory fac = new SequenceMediatorFactory();
-            SequenceMediator sequence = fac.createAnonymousSequence(faultSequenceElt, properties);
+            SequenceMediator sequence = fac.createAnonymousSequence(faultSequenceElt, properties, resolverProvider);
             sequence.setSequenceType(SequenceType.API_FAULTSEQ);
             resource.setFaultSequence(sequence);
         }

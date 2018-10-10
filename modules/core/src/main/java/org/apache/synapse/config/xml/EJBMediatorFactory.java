@@ -19,6 +19,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.bean.BeanConstants;
 import org.apache.synapse.mediators.bean.BeanUtils;
 import org.apache.synapse.mediators.bean.Target;
@@ -35,7 +36,7 @@ public class EJBMediatorFactory extends AbstractMediatorFactory {
     private static final QName EJB_Q =
             new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "ejb");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         EJBMediator mediator = new EJBMediator();
         processAuditStatus(mediator, elem);

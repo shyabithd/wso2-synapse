@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.base.SynapseMediator;
 
 import javax.xml.namespace.QName;
@@ -44,14 +45,14 @@ public class SynapseMediatorFactory extends AbstractListMediatorFactory {
         return RULES_Q;
     }
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         SynapseMediator sm = new SynapseMediator();
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(sm,elem);
 
-        addChildren(elem, sm, properties);
+        addChildren(elem, sm, properties, resolverProvider);
         return sm;
     }
 

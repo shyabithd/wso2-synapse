@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.filters.OutMediator;
 
 import javax.xml.namespace.QName;
@@ -39,14 +40,14 @@ public class OutMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName OUT_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "out");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         OutMediator filter = new OutMediator();
 
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(filter,elem);
 
-        addChildren(elem, filter, properties);
+        addChildren(elem, filter, properties, resolverProvider);
         return filter;
     }
 

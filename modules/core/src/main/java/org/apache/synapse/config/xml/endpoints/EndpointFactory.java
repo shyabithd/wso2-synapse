@@ -30,6 +30,8 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.MediatorPropertyFactory;
+import org.apache.synapse.config.xml.endpoints.utils.Resolver;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.IndirectEndpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -76,8 +78,8 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @return created endpoint
      */
     public static Endpoint getEndpointFromElement(OMElement elem, boolean isAnonymous,
-                                                  Properties properties) {
-        return getEndpointFactory(elem).createEndpointWithName(elem, isAnonymous, properties);
+                                                  Properties properties, ResolverProvider resolverProvider) {
+        return getEndpointFactory(elem).createEndpointWithName(elem, isAnonymous, properties, resolverProvider);
     }
 
     /**
@@ -91,12 +93,13 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @param properties bag of properties to pass in any information to the factory
      * @return created endpoint
      */
-    public static Endpoint getEndpointFromElement(OMElement elem,DefinitionFactory factory,
+    public static Endpoint getEndpointFromElement(OMElement elem, DefinitionFactory factory,
                                                   boolean isAnonymous,
-                                                  Properties properties) {
+                                                  Properties properties,
+                                                  ResolverProvider resolverProvider) {
         EndpointFactory fac = getEndpointFactory(elem);
         fac.setEndpointDefinitionFactory(factory);
-        return fac.createEndpointWithName(elem, isAnonymous, properties);
+        return fac.createEndpointWithName(elem, isAnonymous, properties, resolverProvider);
     }
 
     /**
@@ -106,9 +109,9 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @param properties bag of properties to pass in any information to the factory
      * @return created endpoint as an {@link Object}
      */
-    public Object getObjectFromOMNode(OMNode om, Properties properties) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider) {
         if (om instanceof OMElement) {
-            return createEndpointWithName((OMElement) om, false, properties);
+            return createEndpointWithName((OMElement) om, false, properties, resolverProvider);
         } else {
             handleException("Invalid XML configuration for an Endpoint. OMElement expected");
         }
@@ -127,7 +130,7 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @return Endpoint implementation for the given configuration.
      */
     protected abstract Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                               Properties properties);
+                                               Properties properties, ResolverProvider resolverProvider);
 
     /**
      *  Make sure that the endpoints created by the factory has a name
@@ -138,9 +141,9 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @return Endpoint implementation for the given configuration.
      */
     private Endpoint createEndpointWithName(OMElement epConfig, boolean anonymousEndpoint,
-                                            Properties properties) {
+                                            Properties properties, ResolverProvider resolverProvider) {
         
-        Endpoint ep = createEndpoint(epConfig, anonymousEndpoint, properties);
+        Endpoint ep = createEndpoint(epConfig, anonymousEndpoint, properties, resolverProvider);
         OMElement descriptionElem = epConfig.getFirstChildWithName(DESCRIPTION_Q);
         if (descriptionElem != null) {
             ep.setDescription(descriptionElem.getText());
@@ -271,14 +274,15 @@ public abstract class EndpointFactory implements XMLToObjectMapper {
      * @return List of children endpoints
      */
     protected ArrayList<Endpoint> getEndpoints(OMElement listEndpointElement, Endpoint parent,
-                                               Properties properties) {
+                                               Properties properties, ResolverProvider resolverProvider) {
 
         ArrayList<Endpoint> endpoints = new ArrayList<Endpoint>();
         ArrayList<String> keys = new ArrayList<String>();
         Iterator iter = listEndpointElement.getChildrenWithName(XMLConfigConstants.ENDPOINT_ELT);
         while (iter.hasNext()) {
             OMElement endptElem = (OMElement) iter.next();
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true, properties);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(endptElem, true, properties,
+                                                                       resolverProvider);
             if (endpoint instanceof IndirectEndpoint) {
                 String key = ((IndirectEndpoint) endpoint).getKey();
                 if (!keys.contains(key)) {

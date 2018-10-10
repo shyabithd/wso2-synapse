@@ -45,6 +45,7 @@ import org.apache.synapse.config.xml.TemplateMediatorFactory;
 import org.apache.synapse.config.xml.XMLToTemplateMapper;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.core.axis2.Axis2SynapseEnvironment;
@@ -233,6 +234,12 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
     /** The Completed StructureStore object */
     private CompletedStructureStore completedStructureStore = new CompletedStructureStore();
 
+    private ResolverProvider resolverProvider = new ResolverProvider();
+
+    public ResolverProvider getResolverProvider() {
+
+        return resolverProvider;
+    }
 
     /**
      * Add a named sequence into the local registry. If a sequence already exists by the specified
@@ -504,13 +511,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         if (entry.getType() == Entry.REMOTE_ENTRY) {
             if (registry != null) {
-                o = registry.getResource(entry, getProperties());
+                o = registry.getResource(entry, getProperties(), resolverProvider);
                 if (o != null && o instanceof TemplateMediator) {
                     localRegistry.put(key, entry);
                     return (TemplateMediator) o;
                 } else if (o instanceof OMNode) {
                     TemplateMediator m = (TemplateMediator) new TemplateMediatorFactory().createMediator(
-                            (OMElement) o, properties);
+                            (OMElement) o, properties, resolverProvider);
                     if (m != null) {
                         entry.setValue(m);
                         return m;
@@ -521,7 +528,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             Object value = entry.getValue();
             if (value instanceof OMNode) {
                 Object object = entry.getMapper().getObjectFromOMNode(
-                        (OMNode) value, getProperties());
+                        (OMNode) value, getProperties(), resolverProvider);
                 if (object instanceof TemplateMediator) {
                     entry.setValue(object);
                     return (TemplateMediator) object;
@@ -591,13 +598,14 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         if (entry.getType() == Entry.REMOTE_ENTRY) {
             if (registry != null) {
-                o = registry.getResource(entry, getProperties());
+                o = registry.getResource(entry, getProperties(), resolverProvider);
                 if (o != null && o instanceof Mediator) {
                     localRegistry.put(key, entry);
                     return (Mediator) o;
                 } else if (o instanceof OMNode) {
+
                     Mediator m = (Mediator) MediatorFactoryFinder.getInstance().
-                            getObjectFromOMNode((OMNode) o, properties);
+                            getObjectFromOMNode((OMNode) o, properties, resolverProvider);
                     if (m != null) {
                         entry.setValue(m);
                         return m;
@@ -608,7 +616,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             Object value = entry.getValue();
             if (value instanceof OMNode) {
                 Object object = entry.getMapper().getObjectFromOMNode(
-                        (OMNode) value, getProperties());
+                        (OMNode) value, getProperties(), resolverProvider);
                 if (object instanceof Mediator) {
                     entry.setValue(object);
                     return (Mediator) object;
@@ -850,9 +858,10 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             // This must be a dynamic entry whose cache has expired or which is not cached at all
             // A registry lookup is in order
             if (registry != null) {
+
                 if (entry.isCached()) {
                     try {
-                        o = registry.getResource(entry, getProperties());
+                        o = registry.getResource(entry, getProperties(), resolverProvider);
                     } catch (Exception e) {
                         // Error occurred while loading the resource from the registry
                         // Fall back to the cached value - Do not increase the expiry time
@@ -864,7 +873,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
                 } else {
                     // Resource not available in the cache - Must load from the registry
                     // No fall backs possible here!!
-                    o = registry.getResource(entry, getProperties());
+                    o = registry.getResource(entry, getProperties(), resolverProvider);
                 }
             } else {
                 if (entry.isCached()) {
@@ -1049,13 +1058,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         if (entry.getType() == Entry.REMOTE_ENTRY) {
             if (registry != null) {
-                o = registry.getResource(entry, getProperties());
+                o = registry.getResource(entry, getProperties(), resolverProvider);
                 if (o != null && o instanceof Endpoint) {
                     localRegistry.put(key, entry);
                     return (Endpoint) o;
                 } else if (o instanceof OMNode) {
                     Endpoint e = (Endpoint) XMLToEndpointMapper.getInstance().
-                            getObjectFromOMNode((OMNode) o, properties);
+                            getObjectFromOMNode((OMNode) o, properties, resolverProvider);
                     if (e != null) {
                         entry.setValue(e);
                         return e;
@@ -1066,7 +1075,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             Object value = entry.getValue();
             if (value instanceof OMNode) {
                 Object object = entry.getMapper().getObjectFromOMNode(
-                        (OMNode) value, getProperties());
+                        (OMNode) value, getProperties(), resolverProvider);
                 if (object instanceof Endpoint) {
                     entry.setValue(object);
                     return (Endpoint) object;
@@ -2052,7 +2061,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         if (entry.getType() == Entry.REMOTE_ENTRY) {
             if (registry != null) {
-                o = registry.getResource(entry, getProperties());
+                o = registry.getResource(entry, getProperties(), resolverProvider);
                 if (o != null && o instanceof Template) {
                     localRegistry.put(key, entry);
                     return (Template) o;
@@ -2069,7 +2078,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             Object value = entry.getValue();
             if (value instanceof OMNode) {
                 Object object = entry.getMapper().getObjectFromOMNode(
-                        (OMNode) value, getProperties());
+                        (OMNode) value, getProperties(), resolverProvider);
                 if (object instanceof Template) {
                     entry.setValue(object);
                     return (Template) object;
@@ -2111,13 +2120,13 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
 
         if (entry.getType() == Entry.REMOTE_ENTRY) {
             if (registry != null) {
-                o = registry.getResource(entry, getProperties());
+                o = registry.getResource(entry, getProperties(), resolverProvider);
                 if (o != null && o instanceof Mediator) {
                     localRegistry.put(key, entry);
                     return (Mediator) o;
                 } else if (o instanceof OMNode) {
                     Mediator m = (Mediator) MediatorFactoryFinder.getInstance().
-                            getObjectFromOMNode((OMNode) o, properties);
+                            getObjectFromOMNode((OMNode) o, properties, resolverProvider);
                     if (m != null) {
                         entry.setValue(m);
                         return m;
@@ -2128,7 +2137,7 @@ public class SynapseConfiguration implements ManagedLifecycle, SynapseArtifact {
             Object value = entry.getValue();
             if (value instanceof OMNode) {
                 Object object = entry.getMapper().getObjectFromOMNode(
-                        (OMNode) value, getProperties());
+                        (OMNode) value, getProperties(), resolverProvider);
                 if (object instanceof Mediator) {
                     return (Mediator) object;
                 }

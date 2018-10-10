@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axis2.util.JavaUtils;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.mediators.eip.splitter.CloneMediator;
 
@@ -71,7 +72,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
      * @param properties
      * @return Mediator of the type CloneMediator built from the config element
      */
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
     	
     	boolean asynchronousExe = true;
         
@@ -99,7 +100,7 @@ public class CloneMediatorFactory extends AbstractMediatorFactory {
         
         Iterator targetElements = elem.getChildrenWithName(TARGET_Q);
         while (targetElements.hasNext()) {
-        	Target target = TargetFactory.createTarget((OMElement)targetElements.next(), properties);
+        	Target target = TargetFactory.createTarget((OMElement)targetElements.next(), properties, resolverProvider);
         	target.setAsynchronous(asynchronousExe);
             mediator.addTarget(target);
         }

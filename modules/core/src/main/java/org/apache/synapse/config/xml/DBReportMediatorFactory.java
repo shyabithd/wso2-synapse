@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.db.DBReportMediator;
 
 import javax.xml.namespace.QName;
@@ -62,7 +63,7 @@ public class DBReportMediatorFactory extends AbstractDBMediatorFactory {
             new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dbreport");
     private static final QName DBREPORT_USE_TX = new QName("useTransaction");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         DBReportMediator mediator = new DBReportMediator();
         processAuditStatus(mediator, elem);
 

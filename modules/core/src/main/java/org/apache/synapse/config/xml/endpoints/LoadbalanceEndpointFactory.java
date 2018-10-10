@@ -28,6 +28,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.LoadbalanceEndpoint;
@@ -65,7 +66,7 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                      Properties properties) {
+                                      Properties properties, ResolverProvider resolverProvider) {
 
         // create the endpoint, manager and the algorithms
 
@@ -97,7 +98,7 @@ public final class LoadbalanceEndpointFactory extends EndpointFactory {
                     throw new SynapseException(msg);
                 }
                 List<Endpoint> endpoints
-                        = getEndpoints(loadbalanceElement, loadbalanceEndpoint, properties);
+                        = getEndpoints(loadbalanceElement, loadbalanceEndpoint, properties, resolverProvider);
                 loadbalanceEndpoint.setChildren(endpoints);
                 algorithm =
                         LoadbalanceAlgorithmFactory.

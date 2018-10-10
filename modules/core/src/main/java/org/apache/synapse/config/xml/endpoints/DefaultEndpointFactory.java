@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.DefaultEndpoint;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
@@ -69,7 +70,7 @@ public class DefaultEndpointFactory extends EndpointFactory {
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                      Properties properties) {
+                                      Properties properties, ResolverProvider resolverProvider) {
 
         DefaultEndpoint defaultEndpoint = new DefaultEndpoint();
         OMAttribute name = epConfig.getAttribute(

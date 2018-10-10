@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.DropMediator;
 import org.apache.synapse.mediators.eip.aggregator.AggregateMediator;
@@ -75,7 +76,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
     private static final QName ENCLOSING_ELEMENT_PROPERTY
                 = new QName(XMLConfigConstants.NULL_NAMESPACE, "enclosingElementProperty");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         AggregateMediator mediator = new AggregateMediator();
         processAuditStatus(mediator, elem);
@@ -143,7 +144,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
                 mediator.setOnCompleteSequenceRef(onCompleteSequence.getAttributeValue());
             } else if (onComplete.getFirstElement() != null) {
                 mediator.setOnCompleteSequence((new SequenceMediatorFactory())
-                        .createAnonymousSequence(onComplete, properties));
+                        .createAnonymousSequence(onComplete, properties, resolverProvider));
             } else {
                 SequenceMediator sequence = new SequenceMediator();
                 sequence.addChild(new DropMediator());

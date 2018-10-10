@@ -26,6 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.XMLToObjectMapper;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import sun.misc.Service;
 
 import javax.xml.namespace.QName;
@@ -244,7 +245,7 @@ public class ConfigurationFactoryAndSerializerFinder implements XMLToObjectMappe
      * @param properties bag of properties to pass in any information to the factory
      * @return built object
      */
-    public Object getObjectFromOMNode(OMNode om, Properties properties) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider) {
         if (om instanceof OMElement) {
             return getConfiguration((OMElement) om, properties);
         } else {

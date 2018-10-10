@@ -25,12 +25,13 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import javax.xml.namespace.QName;
 import java.util.Properties;
 
 public class XMLToTemplateMapper implements XMLToObjectMapper {
-    public Object getObjectFromOMNode(OMNode om, Properties properties) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider) {
         if (!(om instanceof OMElement)) {
             throw new SynapseException("Configuration is not in proper format.");
         }
@@ -39,7 +40,7 @@ public class XMLToTemplateMapper implements XMLToObjectMapper {
         OMElement element = elem.getFirstChildWithName(
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
         if (element != null) {
-            return MediatorFactoryFinder.getInstance().getMediator(elem, properties);
+            return MediatorFactoryFinder.getInstance().getMediator(elem, properties, resolverProvider);
         }
 
         element = elem.getFirstChildWithName(

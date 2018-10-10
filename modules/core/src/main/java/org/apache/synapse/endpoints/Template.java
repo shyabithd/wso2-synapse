@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseArtifact;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -51,12 +52,11 @@ public class Template implements SynapseArtifact {
 
     private boolean isEdited;
 
-    public Endpoint create(TemplateEndpoint templateEndpoint, Properties properties) {
+    public Endpoint create(TemplateEndpoint templateEndpoint, Properties properties, ResolverProvider resolverProvider) {
         // first go through all the elements and replace with the parameters
         OMElement clonedElement = element.cloneOMElement();
         replaceElement(templateEndpoint, clonedElement);
-
-        return EndpointFactory.getEndpointFromElement(clonedElement, false, properties);
+        return EndpointFactory.getEndpointFromElement(clonedElement, false, properties, resolverProvider);
     }
 
     public String getName() {

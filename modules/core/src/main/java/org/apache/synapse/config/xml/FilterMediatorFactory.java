@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.filters.FilterMediator;
 import org.jaxen.JaxenException;
 
@@ -60,7 +61,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
     private static final QName THEN_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "then");
     private static final QName ELSE_Q = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "else");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         
         FilterMediator filter = new FilterMediator();
 
@@ -133,7 +134,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                 filter.setThenKey(sequenceAttr.getAttributeValue());
 
             } else {
-                addChildren(thenElem, filter, properties);
+                addChildren(thenElem, filter, properties, resolverProvider);
             }
 
             OMElement elseElem = elem.getFirstChildWithName(ELSE_Q);
@@ -149,7 +150,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
                 } else {
 
                     AnonymousListMediator listMediator = AnonymousListMediatorFactory
-                            .createAnonymousListMediator(elseElem, properties);
+                            .createAnonymousListMediator(elseElem, properties, resolverProvider);
                     filter.setElseMediator(listMediator);
                 }
             }
@@ -157,7 +158,7 @@ public class FilterMediatorFactory extends AbstractListMediatorFactory {
         } else {
 
             filter.setThenElementPresent(false);
-            addChildren(elem, filter, properties);
+            addChildren(elem, filter, properties, resolverProvider);
         }
 
         return filter;

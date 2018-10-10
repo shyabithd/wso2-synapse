@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.AbstractMediatorFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.eventing.EventPublisherMediator;
 
 import javax.xml.namespace.QName;
@@ -45,7 +46,7 @@ public class EventPublisherMediatorFactory extends AbstractMediatorFactory {
         return TAG_NAME;
     }
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         EventPublisherMediator eventPublisherMediator = new EventPublisherMediator();
         processAuditStatus(eventPublisherMediator, elem);
         OMAttribute attEventSource = elem.getAttribute(PROP_NAME);

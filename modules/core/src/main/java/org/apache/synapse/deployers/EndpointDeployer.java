@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.deployment.DeploymentException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.apache.synapse.commons.jmx.MBeanRegistrar;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
@@ -53,7 +54,10 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
         CustomLogSetter.getInstance().setLogAppender(customLogContent);
 
         try {
-            Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false, properties);
+            ResolverProvider resolverProvider = new ResolverProvider();
+            resolverProvider.registerResolvers();
+            Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false, properties,
+                                                                 resolverProvider);
 
             //Set the car name
             ep.setArtifactContainerName(customLogContent);
@@ -90,7 +94,10 @@ public class EndpointDeployer extends AbstractSynapseArtifactDeployer {
     public String updateSynapseArtifact(OMElement artifactConfig, String fileName,
                                         String existingArtifactName, Properties properties) {
 
-        Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false, properties);
+        ResolverProvider resolverProvider = new ResolverProvider();
+        resolverProvider.registerResolvers();
+        Endpoint ep = EndpointFactory.getEndpointFromElement(artifactConfig, false, properties,
+                                                             resolverProvider);
 
         CustomLogSetter.getInstance().setLogAppender((ep != null) ? ep.getArtifactContainerName() : "");
 

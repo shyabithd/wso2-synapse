@@ -24,6 +24,7 @@ import org.apache.axiom.om.impl.builder.StAXOMBuilder;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.ServiceDynamicLoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
@@ -96,7 +97,7 @@ public class ServiceDynamicLoadbalanceEndpointFactory extends EndpointFactory {
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                      Properties properties) {
+                                      Properties properties, ResolverProvider resolverProvider) {
 
         OMElement loadbalanceElement =
                 epConfig.getFirstChildWithName(new QName(SynapseConstants.SYNAPSE_NAMESPACE,

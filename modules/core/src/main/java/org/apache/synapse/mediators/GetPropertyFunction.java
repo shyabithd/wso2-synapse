@@ -30,6 +30,7 @@ import org.apache.synapse.MessageContext;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.core.axis2.Axis2MessageContext;
 import org.apache.synapse.mediators.template.TemplateContext;
 import org.apache.synapse.registry.Registry;
@@ -323,7 +324,9 @@ public class GetPropertyFunction implements Function , XPathFunction {
             }
             Registry registry = synCtx.getConfiguration().getRegistry();
             if (registry != null) {
-                registry.getResource(propEntry, new Properties());
+                ResolverProvider resolverProvider = new ResolverProvider();
+                resolverProvider.registerResolvers();
+                registry.getResource(propEntry, new Properties(), resolverProvider);
                 if (propName != null) {
                     Properties reqProperties = propEntry.getEntryProperties();
                     if (reqProperties != null) {

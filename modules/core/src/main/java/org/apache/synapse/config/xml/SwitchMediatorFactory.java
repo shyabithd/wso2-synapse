@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.filters.SwitchMediator;
 import org.jaxen.JaxenException;
 
@@ -56,7 +57,7 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
     private static final QName DEFAULT_Q
             = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "default");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         SwitchMediator switchMediator = new SwitchMediator();
         OMAttribute source = elem.getAttribute(ATT_SOURCE);
@@ -97,14 +98,14 @@ public class SwitchMediatorFactory extends AbstractMediatorFactory {
                 throw new SynapseException(msg);
             }
             aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator(
-                    caseElem, properties));
+                    caseElem, properties, resolverProvider));
             switchMediator.addCase(aCase);
         }
         iter = elem.getChildrenWithName(DEFAULT_Q);
         while (iter.hasNext()) {
             SwitchCase aCase = new SwitchCase();
             aCase.setCaseMediator(AnonymousListMediatorFactory.createAnonymousListMediator(
-                    (OMElement) iter.next(), properties));
+                    (OMElement) iter.next(), properties, resolverProvider));
             switchMediator.setDefaultCase(aCase);
             break; // add only the *first* default if multiple are specified, ignore rest if any
         }

@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.builtin.PropertyMediator;
 import org.jaxen.JaxenException;
 
@@ -46,7 +47,7 @@ public class PropertyMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_PATTERN = new QName("pattern");
     private static final QName ATT_GROUP = new QName("group");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         PropertyMediator propMediator = new PropertyMediator();
         OMAttribute name = elem.getAttribute(ATT_NAME);

@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.eip.Target;
 
 import javax.xml.namespace.QName;
@@ -59,7 +60,7 @@ public class TargetFactory {
      * @param properties bag of properties with information 
      * @return Target built by parsing the given element
      */
-    public static Target createTarget(OMElement elem, Properties properties) {
+    public static Target createTarget(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         if (!TARGET_Q.equals(elem.getQName())) {
             handleException("Element does not match with the target QName");
@@ -93,13 +94,14 @@ public class TargetFactory {
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence"));
         if (sequence != null) {
             SequenceMediatorFactory fac = new SequenceMediatorFactory();
-            target.setSequence(fac.createAnonymousSequence(sequence, properties));
+            target.setSequence(fac.createAnonymousSequence(sequence, properties, resolverProvider));
         }
 
         OMElement endpoint = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint"));
         if (endpoint != null) {
-            target.setEndpoint(EndpointFactory.getEndpointFromElement(endpoint, true, properties));
+            target.setEndpoint(EndpointFactory.getEndpointFromElement(endpoint, true, properties,
+                                                                      resolverProvider));
         }
 
         return target;

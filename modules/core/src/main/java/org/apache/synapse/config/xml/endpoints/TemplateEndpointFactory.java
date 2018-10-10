@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.TemplateEndpoint;
 
@@ -31,8 +32,9 @@ import java.util.Iterator;
 import java.util.Properties;
 
 public class TemplateEndpointFactory extends EndpointFactory {
-    public Endpoint createEndpoint(OMElement endpointElement, boolean a, Properties properties) {
-        TemplateEndpoint templateEndpoint = new TemplateEndpoint();
+    public Endpoint createEndpoint(OMElement endpointElement, boolean a, Properties properties,
+                                   ResolverProvider resolverProvider) {
+        TemplateEndpoint templateEndpoint = new TemplateEndpoint(resolverProvider);
 
         OMAttribute endpointNameAttribute = endpointElement.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
@@ -47,7 +49,9 @@ public class TemplateEndpointFactory extends EndpointFactory {
         OMAttribute endpointURIAttribute = endpointElement.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "uri"));
         if (endpointURIAttribute != null) {
-            templateEndpoint.addParameter("uri", endpointURIAttribute.getAttributeValue());
+            String epURIValue = endpointURIAttribute.getAttributeValue();
+            epURIValue = resolverProvider.resolve(epURIValue);
+            templateEndpoint.addParameter("uri", epURIValue);
         } /* else {
             handleException("Error loading the configuration from Template Endpoint, " +
                     templateEndpoint.getName() + " uri attribute is missing");

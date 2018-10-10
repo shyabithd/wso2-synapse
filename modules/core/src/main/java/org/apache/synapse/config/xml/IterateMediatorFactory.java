@@ -25,6 +25,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.eip.splitter.IterateMediator;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.util.xpath.SynapseXPath;
@@ -75,7 +76,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
      * @param properties properties passed
      * @return IterateMediator created from the given configuration
      */
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         IterateMediator mediator = new IterateMediator();
         processAuditStatus(mediator, elem);
@@ -136,7 +137,7 @@ public class IterateMediatorFactory extends AbstractMediatorFactory {
 
         OMElement targetElement = elem.getFirstChildWithName(TARGET_Q);
         if (targetElement != null) {
-            Target target = TargetFactory.createTarget(targetElement, properties);
+            Target target = TargetFactory.createTarget(targetElement, properties, resolverProvider);
             if (target != null) {
                 target.setAsynchronous(asynchronous);
                 mediator.setTarget(target);

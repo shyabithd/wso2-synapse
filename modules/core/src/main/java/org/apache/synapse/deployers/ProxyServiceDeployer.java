@@ -24,6 +24,7 @@ import org.apache.axis2.deployment.DeploymentException;
 import org.apache.axis2.description.AxisService;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.transport.customlogsetter.CustomLogSetter;
 import org.apache.synapse.config.xml.MultiXMLConfigurationBuilder;
 import org.apache.synapse.config.xml.ProxyServiceFactory;
@@ -57,7 +58,9 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
         }
 
         try {
-            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig, properties);
+            ResolverProvider resolverProvider = new ResolverProvider();
+            resolverProvider.registerResolvers();
+            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig, properties, resolverProvider);
             proxy.setArtifactContainerName(customLogContent);
             if (proxy != null) {
                 if (getSynapseConfiguration().getProxyService(proxy.getName()) != null) {
@@ -132,7 +135,9 @@ public class ProxyServiceDeployer extends AbstractSynapseArtifactDeployer {
         }
 
         try {
-            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig, properties);
+            ResolverProvider resolverProvider = new ResolverProvider();
+            resolverProvider.registerResolvers();
+            ProxyService proxy = ProxyServiceFactory.createProxy(artifactConfig, properties, resolverProvider);
             if (proxy != null) {
                 proxy.setLogSetterValue();
                 proxy.setFileName((new File(fileName)).getName());

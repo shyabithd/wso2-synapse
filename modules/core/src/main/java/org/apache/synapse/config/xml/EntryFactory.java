@@ -31,6 +31,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMText;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import javax.xml.namespace.QName;
 import java.net.URL;
@@ -47,7 +48,7 @@ public class EntryFactory implements XMLToObjectMapper {
     private static final QName DESCRIPTION_Q
             = new QName(SynapseConstants.SYNAPSE_NAMESPACE, "description");
 
-    public static Entry createEntry(OMElement elem, Properties properties) {
+    public static Entry createEntry(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         String customFactory = SynapsePropertiesLoader.getPropertyValue("synapse.entry.factory", "");
         if (customFactory != null && !"".equals(customFactory)) {
             try {
@@ -93,7 +94,7 @@ public class EntryFactory implements XMLToObjectMapper {
                 try {
                     entry.setSrc(new URL(src.trim()));
                     entry.setType(Entry.URL_SRC);
-                    entry.setValue(SynapseConfigUtils.getObject(entry.getSrc(), properties));
+                    entry.setValue(SynapseConfigUtils.getObject(entry.getSrc(), properties, resolverProvider));
                 } catch (MalformedURLException e) {
                     handleException("The entry with key : " + key + " refers to an invalid URL");
                 }
@@ -125,9 +126,9 @@ public class EntryFactory implements XMLToObjectMapper {
         throw new SynapseException(msg, e);
     }
 
-    public Object getObjectFromOMNode(OMNode om, Properties properties) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider) {
         if (om instanceof OMElement) {
-            return createEntry((OMElement) om, properties);
+            return createEntry((OMElement) om, properties, resolverProvider);
         } else {
             handleException("Invalid XML configuration for an Entry. OMElement expected");
         }

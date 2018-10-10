@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.FailoverEndpoint;
 import org.apache.axis2.util.JavaUtils;
@@ -51,7 +52,7 @@ public class FailoverEndpointFactory extends EndpointFactory {
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                      Properties properties) {
+                                      Properties properties, ResolverProvider resolverProvider) {
 
         OMElement failoverElement = epConfig.getFirstChildWithName
                 (new QName(SynapseConstants.SYNAPSE_NAMESPACE, "failover"));
@@ -65,7 +66,7 @@ public class FailoverEndpointFactory extends EndpointFactory {
             }
 
             List<Endpoint> childEndpoints = getEndpoints(
-                    failoverElement, failoverEndpoint, properties);
+                    failoverElement, failoverEndpoint, properties, resolverProvider);
             if(childEndpoints == null || childEndpoints.size() == 0){
                 String msg = "Invalid Synapse configuration.\n"
                         + "A FailOver must have child elements, but the FailOver "
@@ -75,7 +76,7 @@ public class FailoverEndpointFactory extends EndpointFactory {
             }
 
             // set endpoints and return
-            failoverEndpoint.setChildren(getEndpoints(failoverElement, failoverEndpoint, properties));
+            failoverEndpoint.setChildren(getEndpoints(failoverElement, failoverEndpoint, properties, resolverProvider));
 
             String dynamicFO = failoverElement.getAttributeValue(new QName("dynamic"));
             if (dynamicFO != null && JavaUtils.isFalseExplicitly(dynamicFO)) {

@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.eip.Target;
 import org.apache.synapse.mediators.eip.sample.MessageQueue;
 import org.apache.synapse.mediators.eip.sample.SamplingThrottleMediator;
@@ -56,7 +57,8 @@ public class SamplingThrottleMediatorFactory extends AbstractMediatorFactory {
     private static final QName CLASS_ATTR
             = new QName(XMLConfigConstants.NULL_NAMESPACE, "class");
 
-    public Mediator createSpecificMediator(OMElement omElement, Properties properties) {
+    public Mediator createSpecificMediator(OMElement omElement, Properties properties,
+                                           ResolverProvider resolverProvider) {
 
         SamplingThrottleMediator samplingThrottleMediator = new SamplingThrottleMediator();
         processAuditStatus(samplingThrottleMediator, omElement);
@@ -90,7 +92,7 @@ public class SamplingThrottleMediatorFactory extends AbstractMediatorFactory {
 
         OMElement targetElem = omElement.getFirstChildWithName(TARGET_Q);
         if (targetElem != null) {
-            Target target = TargetFactory.createTarget(targetElem, properties);
+            Target target = TargetFactory.createTarget(targetElem, properties, resolverProvider);
             samplingThrottleMediator.setTarget(target);
         } else {
             handleException("Sampler requires a target for the sampling mediation");

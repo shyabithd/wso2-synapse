@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
 import org.jaxen.JaxenException;
@@ -74,7 +75,7 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
     private static final QName Q_ENDPOINT = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "endpoint");
 
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         CalloutMediator callout = new CalloutMediator();
         processAuditStatus(callout, elem);
@@ -97,7 +98,8 @@ public class CalloutMediatorFactory extends AbstractMediatorFactory {
         }
 
         if (epElement != null) {
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true, properties);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true, properties,
+                                                                       resolverProvider);
             if (endpoint != null) {
                 callout.setEndpoint(endpoint);
             }

@@ -33,6 +33,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.xml.ValueFactory;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.RecipientListEndpoint;
 import org.apache.synapse.mediators.Value;
@@ -65,7 +66,9 @@ public class RecipientListEndpointFactory extends EndpointFactory {
 
 	@Override
 	protected Endpoint createEndpoint(OMElement epConfig,
-			boolean anonymousEndpoint, Properties properties) {
+                                      boolean anonymousEndpoint,
+                                      Properties properties,
+                                      ResolverProvider resolverProvider) {
 		
 		OMElement recipientListElement = epConfig.getFirstChildWithName(
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "recipientlist"));
@@ -93,7 +96,7 @@ public class RecipientListEndpointFactory extends EndpointFactory {
 					throw new SynapseException(msg);
 				}
 				List<Endpoint> endpoints = getEndpoints(recipientListElement,
-						recipientListEndpoint, properties);
+						recipientListEndpoint, properties, resolverProvider);
 				recipientListEndpoint.setChildren(endpoints);
 			}
 			else if(recipientListElement.getFirstChildWithName(MEMBER) != null){

@@ -25,6 +25,7 @@ import org.apache.axis2.util.JavaUtils;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
 import org.apache.synapse.config.xml.endpoints.utils.LoadbalanceAlgorithmFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.SALoadbalanceEndpoint;
 import org.apache.synapse.endpoints.algorithms.LoadbalanceAlgorithm;
@@ -58,7 +59,7 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
     }
 
     protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
-                                      Properties properties) {
+                                      Properties properties, ResolverProvider resolverProvider) {
 
         // create the endpoint, manager and the algorithms
         SALoadbalanceEndpoint loadbalanceEndpoint = new SALoadbalanceEndpoint();
@@ -115,7 +116,7 @@ public class SALoadbalanceEndpointFactory extends EndpointFactory {
 
             // set endpoints
             List<Endpoint> endpoints = getEndpoints(loadbalanceElement,
-                    loadbalanceEndpoint, properties);
+                    loadbalanceEndpoint, properties, resolverProvider);
             loadbalanceEndpoint.setChildren(endpoints);
 
             // set load balance algorithm

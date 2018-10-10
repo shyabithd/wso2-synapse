@@ -26,6 +26,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.commons.lang.StringUtils;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.jaxen.JaxenException;
 
 import javax.xml.namespace.QName;
@@ -58,7 +59,7 @@ public class EnrichMediatorFactory extends AbstractMediatorFactory {
     public static final String INLINE = "inline";
 
     @Override
-    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         if (!XML_Q.equals(elem.getQName())) {
             handleException("Unable to create the enrich mediator. "
                     + "Unexpected element as the enrich mediator configuration");

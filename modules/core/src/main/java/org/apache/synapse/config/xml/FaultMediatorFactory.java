@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.transform.FaultMediator;
 import org.jaxen.JaxenException;
 
@@ -69,7 +70,7 @@ public class FaultMediatorFactory extends AbstractMediatorFactory  {
     private static final String SOAP12 = "soap12";
     private static final String POX = "pox";
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         FaultMediator faultMediator = new FaultMediator();
 

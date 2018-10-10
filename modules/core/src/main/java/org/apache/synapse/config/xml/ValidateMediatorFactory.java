@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.builtin.ValidateMediator;
 import org.jaxen.JaxenException;
@@ -52,7 +53,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
     private static final QName SCHEMA_Q   = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "schema");
     private static final QName ATT_CACHE_SCHEMA = new QName("cache-schema");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         ValidateMediator validateMediator = new ValidateMediator();
 
@@ -119,7 +120,7 @@ public class ValidateMediatorFactory extends AbstractListMediatorFactory {
         }
 
         if (onFail != null && onFail.getChildElements().hasNext()) {
-            addChildren(onFail, validateMediator, properties);
+            addChildren(onFail, validateMediator, properties, resolverProvider);
         } else {
             handleException("A non-empty <on-fail> child element is required for " +
                 "the <validate> mediator");

@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import javax.xml.namespace.QName;
 import java.util.Properties;
@@ -44,7 +45,7 @@ public interface MediatorFactory {
      * @param properties bag of properties to pass in any information to the factory
      * @return the created mediator
      */
-    public Mediator createMediator(OMElement elem, Properties properties);
+    public Mediator createMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider);
 
     /**
      * The QName of this mediator element in the XML config

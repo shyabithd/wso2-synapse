@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.ext.ClassMediator;
 
 import javax.xml.namespace.QName;
@@ -46,7 +47,7 @@ public class ClassMediatorFactory extends AbstractMediatorFactory {
 
     private static final QName CLASS_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "class");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         ClassMediator classMediator = new ClassMediator();
 

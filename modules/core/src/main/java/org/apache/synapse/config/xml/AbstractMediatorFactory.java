@@ -31,6 +31,7 @@ import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.AspectConfigurable;
 import org.apache.synapse.aspects.AspectConfiguration;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import javax.xml.namespace.QName;
 import java.util.Iterator;
@@ -81,17 +82,19 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * Creates the mediator by looking at the given XML element. This method handles
      * extracting the common information from the respective element. It delegates the mediator
      * specific building to the {@link #createSpecificMediator(org.apache.axiom.om.OMElement,
-     * java.util.Properties)} method, which has tobe implemented by the respective mediators</p>
+     * java.util.Properties, org.apache.synapse.config.xml.endpoints.utils.ResolverProvider)} method, which has tobe implemented
+     * by
+     * the respective mediators</p>
      *
      * <p>This method has been marked as <code>final</code> to avoid mistakenly overwriting
      * this method instead of the {@link #createSpecificMediator(org.apache.axiom.om.OMElement,
-     * java.util.Properties)} by the sub classes
+     * java.util.Properties, org.apache.synapse.config.xml.endpoints.utils.ResolverProvider)} by the sub classes
      *
      * @param elem configuration element of the mediator to be built
      * @return built mediator using the above element
      */
-    public final Mediator createMediator(OMElement elem, Properties properties) {
-        Mediator mediator = createSpecificMediator(elem, properties);
+    public final Mediator createMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
+        Mediator mediator = createSpecificMediator(elem, properties, resolverProvider);
         OMElement descElem = elem.getFirstChildWithName(DESCRIPTION_Q);
         if (descElem != null) {
             mediator.setDescription(descElem.getText());
@@ -111,7 +114,8 @@ public abstract class AbstractMediatorFactory implements MediatorFactory {
      * @param properties bag of properties to pass in any information to the factory
      * @return built mediator of that specific type
      */
-    protected abstract Mediator createSpecificMediator(OMElement elem, Properties properties);
+    protected abstract Mediator createSpecificMediator(OMElement elem, Properties properties,
+                                                       ResolverProvider resolverProvider);
 
     /**
      * This is to Initialize the mediator with the default attributes.

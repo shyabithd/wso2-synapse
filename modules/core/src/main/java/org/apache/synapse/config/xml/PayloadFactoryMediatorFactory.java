@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMText;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.Value;
 import org.apache.synapse.mediators.transform.Argument;
 import org.apache.synapse.mediators.transform.PayloadFactoryMediator;
@@ -51,7 +52,7 @@ public class PayloadFactoryMediatorFactory extends AbstractMediatorFactory {
     private final String TEXT_TYPE="text";
 
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         PayloadFactoryMediator payloadFactoryMediator = new PayloadFactoryMediator();
         processAuditStatus(payloadFactoryMediator, elem);

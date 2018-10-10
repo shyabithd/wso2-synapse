@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.config.XMLToObjectMapper;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.config.xml.eventing.EventPublisherMediatorFactory;
 import org.apache.synapse.libraries.imports.SynapseImport;
 import org.apache.synapse.libraries.model.Library;
@@ -171,7 +172,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
      * @param properties bag of properties to pass in any information to the factory
      * @return Processor
 	 */
-	public Mediator getMediator(OMElement element, Properties properties) {
+	public Mediator getMediator(OMElement element, Properties properties, ResolverProvider resolverProvider) {
 
         String localName = element.getLocalName();
         QName qName;
@@ -220,7 +221,7 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
 
         try {
 			MediatorFactory mf = (MediatorFactory) cls.newInstance();
-			return mf.createMediator(element, properties);
+			return mf.createMediator(element, properties, resolverProvider);
 
         } catch (InstantiationException e) {
             String msg = "Error initializing mediator factory : " + cls;
@@ -248,9 +249,9 @@ public class MediatorFactoryFinder implements XMLToObjectMapper {
      * @param om node from which the object is expected
      * @return Object buit from the om node
      */
-    public Object getObjectFromOMNode(OMNode om, Properties properties) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider) {
         if (om instanceof OMElement) {
-            return getMediator((OMElement) om, properties);
+            return getMediator((OMElement) om, properties, resolverProvider);
         } else {
             handleException("Invalid mediator configuration XML : " + om);
         }

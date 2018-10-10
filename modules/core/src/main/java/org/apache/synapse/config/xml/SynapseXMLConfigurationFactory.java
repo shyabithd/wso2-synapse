@@ -37,6 +37,8 @@ import org.apache.synapse.config.SynapseConfigUtils;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
 import org.apache.synapse.config.xml.endpoints.TemplateFactory;
+import org.apache.synapse.config.xml.endpoints.utils.Resolver;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.config.xml.eventing.EventSourceFactory;
 import org.apache.synapse.config.xml.inbound.InboundEndpointFactory;
 import org.apache.synapse.config.xml.rest.APIFactory;
@@ -68,6 +70,8 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 
     public SynapseConfiguration getConfiguration(OMElement definitions, Properties properties) {
 
+        ResolverProvider resolverProvider = new ResolverProvider();
+        resolverProvider.registerResolvers();
         if (!definitions.getQName().equals(XMLConfigConstants.DEFINITIONS_ELT)) {
             throw new SynapseException(
                     "Wrong QName for this configuration factory " + definitions.getQName());
@@ -86,18 +90,18 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                     if (key != null) {
                         handleException("Referred sequences are not allowed at the top level");
                     } else {
-                        defineSequence(config, elt, properties);
+                        defineSequence(config, elt, properties, resolverProvider);
                     }
                 } else if (XMLConfigConstants.TEMPLATE_ELT.equals(elt.getQName())) {
-                    defineTemplate(config, elt, properties);
+                    defineTemplate(config, elt, properties, resolverProvider);
                 } else if (XMLConfigConstants.IMPORT_ELT.equals(elt.getQName())) {
                     defineImport(config, elt, properties);
                 } else if (XMLConfigConstants.ENDPOINT_ELT.equals(elt.getQName())) {
-                    defineEndpoint(config, elt, properties);
+                    defineEndpoint(config, elt, properties, resolverProvider);
                 } else if (XMLConfigConstants.ENTRY_ELT.equals(elt.getQName())) {
                     defineEntry(config, elt, properties);
                 } else if (XMLConfigConstants.PROXY_ELT.equals(elt.getQName())) {
-                    defineProxy(config, elt, properties);
+                    defineProxy(config, elt, properties, resolverProvider);
                 } else if (XMLConfigConstants.REGISTRY_ELT.equals(elt.getQName())) {
                     defineRegistry(config, elt, properties);
                 } else if (XMLConfigConstants.EVENT_SOURCE_ELT.equals(elt.getQName())) {
@@ -113,7 +117,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
                 } else if (StartupFinder.getInstance().isStartup(elt.getQName())) {
                     defineStartup(config, elt, properties);
                 } else if (XMLConfigConstants.API_ELT.equals(elt.getQName())) {
-                    defineAPI(config, elt, properties);
+                    defineAPI(config, elt, properties, resolverProvider);
                 } else if (XMLConfigConstants.DESCRIPTION_ELT.equals(elt.getQName())) {
                     config.setDescription(elt.getText());
                 } else if (XMLConfigConstants.INBOUND_ENDPOINT_ELT.equals(elt.getQName())) {
@@ -159,11 +163,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     }
 
     public static ProxyService defineProxy(SynapseConfiguration config, OMElement elem,
-                                           Properties properties) {
+                                           Properties properties, ResolverProvider resolverProvider) {
         ProxyService proxy = null;
 
         try {
-            proxy = ProxyServiceFactory.createProxy(elem, properties);
+            proxy = ProxyServiceFactory.createProxy(elem, properties, resolverProvider);
             if (proxy != null) {
                 config.addProxyService(proxy.getName(), proxy);
             }
@@ -181,7 +185,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         Entry entry = null;
 
         try {
-            entry = EntryFactory.createEntry(elem, properties);
+            entry = EntryFactory.createEntry(elem, properties, config.getResolverProvider());
             if (entry != null) {
                 config.addEntry(entry.getKey(), entry);
             }
@@ -197,7 +201,7 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 			Properties properties,Library library) {
 		Entry entry = null;
 		try {
-			entry = EntryFactory.createEntry(elem, properties);
+			entry = EntryFactory.createEntry(elem, properties, config.getResolverProvider());
 			String key = library.getQName().getLocalPart()+"."+entry.getKey();
 			if(entry != null && config.getEntry(key) != null){
 				//already existing thus need to update entry
@@ -218,14 +222,14 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
 	}
 
     public static Mediator defineSequence(SynapseConfiguration config, OMElement ele,
-                                          Properties properties) {
+                                          Properties properties, ResolverProvider resolverProvider) {
 
         Mediator mediator = null;
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
             try {
             	MediatorFactoryFinder.getInstance().setSynapseImportMap(config.getSynapseImports());
-                mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties);
+                mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties, resolverProvider);
                 if (mediator != null) {
                     config.addSequence(name, mediator);
                     // mandatory sequence is treated as a special sequence because it will be fetched for
@@ -248,13 +252,13 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     }
 
     public static Mediator defineMediatorTemplate(SynapseConfiguration config, OMElement ele,
-                                                  Properties properties) {
+                                                  Properties properties, ResolverProvider resolverProvider) {
 
         Mediator mediator = null;
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         if (name != null) {
             try {
-                mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties);
+                mediator = MediatorFactoryFinder.getInstance().getMediator(ele, properties, resolverProvider);
                 if (mediator != null) {
                     config.addSequenceTemplate(name, (TemplateMediator) mediator) ;
                 }
@@ -271,13 +275,13 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     }
 
     public static Endpoint defineEndpoint(SynapseConfiguration config, OMElement ele,
-                                          Properties properties) {
+                                          Properties properties, ResolverProvider resolverProvider) {
 
         String name = ele.getAttributeValue(new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
         Endpoint endpoint = null;
         if (name != null) {
             try {
-                endpoint = EndpointFactory.getEndpointFromElement(ele, false, properties);
+                endpoint = EndpointFactory.getEndpointFromElement(ele, false, properties, resolverProvider);
                 if (endpoint != null) {
                     config.addEndpoint(name.trim(), endpoint);
                 }
@@ -384,11 +388,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
     }
 
     public static void defineTemplate(SynapseConfiguration config,
-                                      OMElement elem, Properties properties) {
+                                      OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         OMElement element = elem.getFirstChildWithName(
                 new QName(SynapseConstants.SYNAPSE_NAMESPACE, "sequence"));
         if (element != null) {
-            defineMediatorTemplate(config, elem, properties);
+            defineMediatorTemplate(config, elem, properties, resolverProvider);
         }
 
         element = elem.getFirstChildWithName(
@@ -398,14 +402,15 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
         }
     }
 
-    public static API defineAPI(SynapseConfiguration config, OMElement elem) {
-        return defineAPI(config, elem, new Properties());
+    public static API defineAPI(SynapseConfiguration config, OMElement elem, ResolverProvider resolverProvider) {
+        return defineAPI(config, elem, new Properties(), resolverProvider);
     }
 
-    public static API defineAPI(SynapseConfiguration config, OMElement elem, Properties properties) {
+    public static API defineAPI(SynapseConfiguration config, OMElement elem, Properties properties, ResolverProvider
+            resolverProvider) {
         API api = null;
         try {
-            api = APIFactory.createAPI(elem, properties);
+            api = APIFactory.createAPI(elem, properties, resolverProvider);
             config.addAPI(api.getName(), api);
         } catch (Exception e) {
             String msg = "API configuration cannot be built";
@@ -423,10 +428,11 @@ public class SynapseXMLConfigurationFactory implements ConfigurationFactory {
      * @param reOrder reorder the deployment order based on the context
      * @return API api object
      */
-    public static API defineAPI(SynapseConfiguration config, OMElement elem, Properties properties, boolean reOrder) {
+    public static API defineAPI(SynapseConfiguration config, OMElement elem, Properties properties, boolean reOrder,
+                                ResolverProvider resolverProvider) {
         API api = null;
         try {
-            api = APIFactory.createAPI(elem, properties);
+            api = APIFactory.createAPI(elem, properties, resolverProvider);
             config.addAPI(api.getName(), api, reOrder);
         } catch (Exception e) {
             String msg = "API configuration cannot be built";

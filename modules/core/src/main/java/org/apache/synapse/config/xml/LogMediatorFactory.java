@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.builtin.LogMediator;
 
 import javax.xml.namespace.QName;
@@ -57,7 +58,7 @@ public class LogMediatorFactory extends AbstractMediatorFactory  {
         return LOG_Q;
     }
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         LogMediator logMediator = new LogMediator();
 

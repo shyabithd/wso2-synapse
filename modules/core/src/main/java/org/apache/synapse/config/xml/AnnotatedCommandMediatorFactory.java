@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.ext.AnnotatedCommandMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
@@ -48,7 +49,7 @@ public class AnnotatedCommandMediatorFactory extends AbstractMediatorFactory {
     private static final QName ANNOTATED_COMMAND_Q =
         new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "annotatedCommand");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         AnnotatedCommandMediator pojoMediator = new AnnotatedCommandMediator();
         processAuditStatus(pojoMediator, elem);

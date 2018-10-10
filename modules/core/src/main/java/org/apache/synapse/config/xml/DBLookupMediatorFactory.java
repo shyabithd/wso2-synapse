@@ -22,6 +22,7 @@ package org.apache.synapse.config.xml;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.db.DBLookupMediator;
 
 import javax.xml.namespace.QName;
@@ -63,7 +64,7 @@ public class DBLookupMediatorFactory extends AbstractDBMediatorFactory {
     private static final QName DBLOOKUP_Q =
         new QName(SynapseConstants.SYNAPSE_NAMESPACE, "dblookup");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         DBLookupMediator mediator = new DBLookupMediator();
         processAuditStatus(mediator, elem);

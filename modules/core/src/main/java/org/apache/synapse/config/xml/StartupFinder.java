@@ -32,6 +32,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.Startup;
 import org.apache.synapse.config.XMLToObjectMapper;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.startup.quartz.SimpleQuartzFactory;
 
 import sun.misc.Service;
@@ -234,7 +235,7 @@ public class StartupFinder implements XMLToObjectMapper {
      * @param properties bag of properties with additional information
      * @return startup created
      */
-    public Startup getObjectFromOMNode(OMNode om, Properties properties) {
+    public Startup getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider) {
         if (om instanceof OMElement) {
             return getStartup((OMElement) om, properties);
         } else {

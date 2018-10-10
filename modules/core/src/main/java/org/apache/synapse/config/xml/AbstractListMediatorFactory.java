@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.ListMediator;
 import org.apache.synapse.mediators.builtin.CommentMediator;
 
@@ -36,14 +37,16 @@ import java.util.Properties;
  */
 public abstract class AbstractListMediatorFactory extends AbstractMediatorFactory {
 
-    protected static void addChildren(OMElement el, ListMediator m, Properties properties) {
+    protected static void addChildren(OMElement el, ListMediator m, Properties properties,
+                                      ResolverProvider resolverProvider) {
         Iterator it = el.getChildren();
 
         while (it.hasNext()) {
             OMNode child = (OMNode) it.next();
             if (child instanceof OMElement) {
                 if (!DESCRIPTION_Q.equals(((OMElement) child).getQName())) { // neglect the description tag
-                    Mediator med = MediatorFactoryFinder.getInstance().getMediator((OMElement) child, properties);
+                    Mediator med = MediatorFactoryFinder.getInstance().getMediator((OMElement) child,
+                                                                                   properties, resolverProvider);
                     if (med != null) {
                         m.addChild(med);
                     } else {

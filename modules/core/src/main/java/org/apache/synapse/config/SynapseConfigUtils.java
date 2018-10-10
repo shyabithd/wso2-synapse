@@ -38,6 +38,7 @@ import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.aspects.flow.statistics.StatisticIdentityGenerator;
 import org.apache.synapse.aspects.flow.statistics.StatisticSynapseConfigurationObserver;
 import org.apache.synapse.aspects.flow.statistics.collectors.RuntimeStatisticCollector;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.mediators.MediatorProperty;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -181,7 +182,7 @@ public class SynapseConfigUtils {
      * @param properties bag of properties to pass in any information to the factory
      * @return an Object created from the given URL
      */
-    public static Object getObject(URL url, Properties properties) {
+    public static Object getObject(URL url, Properties properties, ResolverProvider resolverProvider) {
         try {
             if (url != null && "file".equals(url.getProtocol())) {
                 try {
@@ -238,7 +239,7 @@ public class SynapseConfigUtils {
                 omElem.build();
 
                 if (xmlToObject != null) {
-                    return xmlToObject.getObjectFromOMNode(omElem, properties);
+                    return xmlToObject.getObjectFromOMNode(omElem, properties, resolverProvider);
                 } else {
                     return omElem;
                 }

@@ -21,6 +21,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.store.MessageStoreMediator;
 import org.jaxen.JaxenException;
 
@@ -43,7 +44,7 @@ public class MessageStoreMediatorFactory extends AbstractMediatorFactory{
     private static final QName ATT_SEQUENCE   = new QName("sequence");
 
     @Override
-    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         MessageStoreMediator messageStoreMediator = new MessageStoreMediator();
         processAuditStatus(messageStoreMediator, elem);
         OMAttribute nameAtt = elem.getAttribute(ATT_NAME);

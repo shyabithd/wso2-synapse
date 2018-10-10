@@ -21,6 +21,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.filters.InMediator;
 
 import javax.xml.namespace.QName;
@@ -40,12 +41,12 @@ public class InMediatorFactory extends AbstractListMediatorFactory {
 
     private static final QName IN_Q = new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "in");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         InMediator filter = new InMediator();
         // after successfully creating the mediator
         // set its common attributes such as tracing etc
         processAuditStatus(filter,elem);
-        addChildren(elem, filter, properties);
+        addChildren(elem, filter, properties, resolverProvider);
         return filter;
     }
 

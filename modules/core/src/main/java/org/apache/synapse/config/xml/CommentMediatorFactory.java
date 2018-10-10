@@ -18,6 +18,7 @@ package org.apache.synapse.config.xml;
 
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.builtin.CommentMediator;
 
 import javax.xml.namespace.QName;
@@ -39,7 +40,7 @@ public class CommentMediatorFactory extends AbstractMediatorFactory {
      * @return CommentMediator instance created with the given comment text
      */
     @Override
-    protected Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    protected Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
         CommentMediator commentMediator = new CommentMediator();
         commentMediator.setCommentText(elem.getText());
         return commentMediator;

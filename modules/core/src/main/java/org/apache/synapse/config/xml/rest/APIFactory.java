@@ -29,6 +29,7 @@ import org.apache.synapse.SynapseException;
 import org.apache.synapse.aspects.AspectConfiguration;
 import org.apache.synapse.commons.util.PropertyHelper;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.rest.API;
 import org.apache.synapse.rest.Handler;
 import org.apache.synapse.rest.RESTConstants;
@@ -50,10 +51,13 @@ public class APIFactory {
     static final QName ATT_VALUE   = new QName("value");
 
     public static API createAPI(OMElement apiElt) {
-        return createAPI(apiElt, new Properties());
+
+        ResolverProvider resolverProvider = new ResolverProvider();
+        resolverProvider.registerResolvers();
+        return createAPI(apiElt, new Properties(), resolverProvider);
     }
 
-    public static API createAPI(OMElement apiElt, Properties properties) {
+    public static API createAPI(OMElement apiElt, Properties properties, ResolverProvider resolverProvider) {
         OMAttribute nameAtt = apiElt.getAttribute(new QName("name"));
         if (nameAtt == null || "".equals(nameAtt.getAttributeValue())) {
             handleException("Attribute 'name' is required for an API definition");
@@ -85,7 +89,7 @@ public class APIFactory {
         boolean noResources = true;
         while (resources.hasNext()) {
             OMElement resourceElt = (OMElement) resources.next();
-            api.addResource(ResourceFactory.createResource(resourceElt, properties));
+            api.addResource(ResourceFactory.createResource(resourceElt, properties, resolverProvider));
             noResources = false;
         }
 

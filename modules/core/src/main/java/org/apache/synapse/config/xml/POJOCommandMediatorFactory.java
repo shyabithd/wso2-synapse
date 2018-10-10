@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.ext.POJOCommandMediator;
 import org.apache.synapse.util.xpath.SynapseXPath;
 import org.jaxen.JaxenException;
@@ -64,7 +65,7 @@ public class POJOCommandMediatorFactory extends AbstractMediatorFactory {
     protected static final String RAUM_ACTION = "ReadAndUpdateMessage";
     protected static final String RAUC_ACTION = "ReadAndUpdateContext";
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         POJOCommandMediator pojoMediator = new POJOCommandMediator();
         processAuditStatus(pojoMediator, elem);

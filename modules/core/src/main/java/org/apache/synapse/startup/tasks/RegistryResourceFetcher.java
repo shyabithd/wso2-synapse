@@ -31,6 +31,7 @@ import org.apache.synapse.config.Entry;
 import org.apache.synapse.config.SynapseConfiguration;
 import org.apache.synapse.config.xml.MediatorFactoryFinder;
 import org.apache.synapse.config.xml.endpoints.XMLToEndpointMapper;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.core.SynapseEnvironment;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.base.SequenceMediator;
@@ -182,6 +183,8 @@ public class RegistryResourceFetcher implements Task, ManagedLifecycle {
                 return;
             }
 
+            ResolverProvider resolverProvider = new ResolverProvider();
+            resolverProvider.registerResolvers();
             for (RegistryResourceEntry key : registryResources) {
                 if (state == State.ACTIVE) {
                     Entry entry = synapseConfiguration.getEntryDefinition(key.getPath());
@@ -197,7 +200,7 @@ public class RegistryResourceFetcher implements Task, ManagedLifecycle {
                         entry.setMapper(XMLToEndpointMapper.getInstance());
                     }
 
-                    fetchEntry(key.getPath());
+                    fetchEntry(key.getPath(), resolverProvider);
                 }
             }
 
@@ -231,7 +234,7 @@ public class RegistryResourceFetcher implements Task, ManagedLifecycle {
      *
      * @param key the key of the resource required
      */
-    private void fetchEntry(String key) {
+    private void fetchEntry(String key, ResolverProvider resolverProvider) {
         Map localRegistry = synapseConfiguration.getLocalRegistry();
 
         Object o = localRegistry.get(key);
@@ -243,7 +246,7 @@ public class RegistryResourceFetcher implements Task, ManagedLifecycle {
             if (registry != null) {
                 if (entry.isCached()) {
                     try {
-                        Object resource = getResource(entry, synapseConfiguration.getProperties());
+                        Object resource = getResource(entry, synapseConfiguration.getProperties(), resolverProvider);
                         if (resource == null) {
                             log.warn("Failed to load the resource at the first time, " +
                                     "non-existing resource: " + key);
@@ -263,7 +266,7 @@ public class RegistryResourceFetcher implements Task, ManagedLifecycle {
                     try {
                         // Resource not available in the cache - Must load from the registry
                         // No fall backs possible here!!
-                        Object resource = getResource(entry, synapseConfiguration.getProperties());
+                        Object resource = getResource(entry, synapseConfiguration.getProperties(), resolverProvider);
                         if (resource == null) {
                             log.warn("Failed to load the resource at the first time, " +
                                     "non-existing resource: " + key);
@@ -292,7 +295,7 @@ public class RegistryResourceFetcher implements Task, ManagedLifecycle {
         }
     }
 
-    private Object getResource(Entry entry, Properties properties) {
+    private Object getResource(Entry entry, Properties properties, ResolverProvider resolverProvider) {
 
         OMNode omNode;
         RegistryEntry re = registry.getRegistryEntry(entry.getKey());
@@ -314,7 +317,7 @@ public class RegistryResourceFetcher implements Task, ManagedLifecycle {
             // if we have a XMLToObjectMapper for this entry, use it to convert this
             // resource into the appropriate object - e.g. sequence or endpoint
             if (entry.getMapper() != null) {
-                entry.setValue(entry.getMapper().getObjectFromOMNode(omNode, properties));
+                entry.setValue(entry.getMapper().getObjectFromOMNode(omNode, properties, resolverProvider));
 
                 if (entry.getValue() instanceof SequenceMediator) {
                     SequenceMediator seq = (SequenceMediator) entry.getValue();

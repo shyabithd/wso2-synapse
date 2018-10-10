@@ -27,6 +27,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.Startup;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Template;
 import org.apache.synapse.inbound.InboundEndpoint;
 import org.apache.synapse.libraries.imports.SynapseImport;
@@ -138,20 +139,20 @@ public class MultiXMLConfigurationBuilder {
                     " will be neglected");
         }
 
-
+        ResolverProvider resolverProvider = synapseConfig.getResolverProvider();
         createSynapseImports(synapseConfig, root, properties);
         createLocalEntries(synapseConfig, root, properties);
-        createEndpoints(synapseConfig, root, properties);
-        createSequences(synapseConfig, root, properties);
-        createTemplates(synapseConfig, root, properties);
-        createProxyServices(synapseConfig, root, properties);
+        createEndpoints(synapseConfig, root, properties, resolverProvider);
+        createSequences(synapseConfig, root, properties, resolverProvider);
+        createTemplates(synapseConfig, root, properties, resolverProvider);
+        createProxyServices(synapseConfig, root, properties, resolverProvider);
         createTasks(synapseConfig, root, properties);
         createEventSources(synapseConfig, root, properties);
         createExecutors(synapseConfig, root, properties);
         createMessageStores(synapseConfig, root, properties);
         createMessageProcessors(synapseConfig, root, properties);
-        createAPIs(synapseConfig, root, properties);
-        createInboundEndpoint(synapseConfig, root, properties);
+        createAPIs(synapseConfig, root, properties, resolverProvider);
+        createInboundEndpoint(synapseConfig, root, properties, resolverProvider);
         return synapseConfig;
     }
 
@@ -257,7 +258,7 @@ public class MultiXMLConfigurationBuilder {
     }
 
     private static void createProxyServices(SynapseConfiguration synapseConfig, String rootDirPath,
-                                            Properties properties) {
+                                            Properties properties, ResolverProvider resolverProvider) {
 
         File proxyServicesDir = new File(rootDirPath, PROXY_SERVICES_DIR);
         if (proxyServicesDir.exists()) {
@@ -272,7 +273,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = getOMElement(file);
                     ProxyService proxy = SynapseXMLConfigurationFactory.defineProxy(synapseConfig,
-                            document, properties);
+                            document, properties, resolverProvider);
                     if (proxy != null) {
                         proxy.setFileName(file.getName());
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
@@ -314,7 +315,7 @@ public class MultiXMLConfigurationBuilder {
     }
 
     private static void createSequences(SynapseConfiguration synapseConfig, String rootDirPath,
-                                        Properties properties) {
+                                        Properties properties, ResolverProvider resolverProvider) {
 
         File sequencesDir = new File(rootDirPath, SEQUENCES_DIR);
         if (sequencesDir.exists()) {
@@ -328,7 +329,7 @@ public class MultiXMLConfigurationBuilder {
                 try{
                     OMElement document = getOMElement(file);
                     Mediator seq = SynapseXMLConfigurationFactory.defineSequence(synapseConfig,
-                            document, properties);
+                            document, properties, resolverProvider);
                     if (seq != null && seq instanceof SequenceMediator) {
                         SequenceMediator sequence = (SequenceMediator) seq;
                         sequence.setFileName(file.getName());
@@ -345,7 +346,7 @@ public class MultiXMLConfigurationBuilder {
     }
 
     private static void createTemplates(SynapseConfiguration synapseConfig, String rootDirPath,
-                                        Properties properties) {
+                                        Properties properties, ResolverProvider resolverProvider) {
 
         File templatesDir = new File(rootDirPath, TEMPLATES_DIR);
         if (templatesDir.exists()) {
@@ -362,7 +363,7 @@ public class MultiXMLConfigurationBuilder {
                     if (element != null) {
                         TemplateMediator mediator =
                                 (TemplateMediator) SynapseXMLConfigurationFactory.defineMediatorTemplate(
-                                        synapseConfig, document, properties);
+                                        synapseConfig, document, properties, resolverProvider);
                         if (mediator != null) {
                             mediator.setFileName(file.getName());
                             synapseConfig.getArtifactDeploymentStore().addArtifact(
@@ -391,7 +392,7 @@ public class MultiXMLConfigurationBuilder {
     }
 
     private static void createEndpoints(SynapseConfiguration synapseConfig, String rootDirPath,
-                                        Properties properties) {
+                                        Properties properties, ResolverProvider resolverProvider) {
 
         File endpointsDir = new File(rootDirPath, ENDPOINTS_DIR);
         if (endpointsDir.exists()) {
@@ -405,7 +406,7 @@ public class MultiXMLConfigurationBuilder {
                 try {
                     OMElement document = getOMElement(file);
                     Endpoint endpoint = SynapseXMLConfigurationFactory.defineEndpoint(
-                            synapseConfig, document, properties);
+                            synapseConfig, document, properties, resolverProvider);
                     if (endpoint != null) {
                         endpoint.setFileName(file.getName());
                         synapseConfig.getArtifactDeploymentStore().addArtifact(
@@ -565,7 +566,7 @@ public class MultiXMLConfigurationBuilder {
 
 
     private static void createAPIs(SynapseConfiguration synapseConfig,
-                                   String rootDirPath, Properties properties) {
+                                   String rootDirPath, Properties properties, ResolverProvider resolverProvider) {
 
         File apiDir = new File(rootDirPath, REST_API_DIR);
         if (apiDir.exists()) {
@@ -578,7 +579,8 @@ public class MultiXMLConfigurationBuilder {
                 File file = (File) apiIterator.next();
                 try {
                     OMElement document = getOMElement(file);
-                    API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document, properties, false);
+                    API api = SynapseXMLConfigurationFactory.defineAPI(synapseConfig, document, properties,
+                                                                       false, resolverProvider);
                     if (api != null) {
                         api.setFileName(file.getName());
                         synapseConfig.getArtifactDeploymentStore().addArtifact(file.getAbsolutePath(),
@@ -600,8 +602,8 @@ public class MultiXMLConfigurationBuilder {
     }
 
 
-    private static void createInboundEndpoint(SynapseConfiguration synapseConfig,
-                                              String rootDirPath, Properties properties) {
+    private static void createInboundEndpoint(SynapseConfiguration synapseConfig, String rootDirPath,
+                                              Properties properties, ResolverProvider resolverProvider) {
         File inboundEndpointDir = new File(rootDirPath, INBOUND_ENDPOINT_DIR);
         if (inboundEndpointDir.exists()) {
             if (log.isDebugEnabled()) {

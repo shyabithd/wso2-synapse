@@ -24,6 +24,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseException;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.transform.HeaderMediator;
 import org.jaxen.JaxenException;
 
@@ -50,7 +51,7 @@ public class HeaderMediatorFactory extends AbstractMediatorFactory  {
     private static final QName ATT_ACTION = new QName("action");
     private static final QName ATT_SCOPE = new QName("scope");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         HeaderMediator headerMediator = new HeaderMediator();
         OMAttribute name   = elem.getAttribute(ATT_NAME);

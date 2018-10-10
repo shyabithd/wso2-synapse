@@ -25,6 +25,7 @@ import org.apache.axiom.om.OMElement;
 import org.apache.axis2.Constants;
 import org.apache.synapse.SynapseConstants;
 import org.apache.synapse.config.xml.XMLConfigConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.endpoints.EndpointDefinition;
 import org.apache.synapse.endpoints.HTTPEndpoint;
@@ -56,7 +57,8 @@ public class HTTPEndpointFactory extends DefaultEndpointFactory {
     }
 
     @Override
-    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint, Properties properties) {
+    protected Endpoint createEndpoint(OMElement epConfig, boolean anonymousEndpoint,
+                                      Properties properties, ResolverProvider resolverProvider) {
         HTTPEndpoint httpEndpoint = new HTTPEndpoint();
         OMAttribute name = epConfig.getAttribute(
                 new QName(XMLConfigConstants.NULL_NAMESPACE, "name"));
@@ -75,22 +77,22 @@ public class HTTPEndpointFactory extends DefaultEndpointFactory {
             OMAttribute uriTemplateAttr = httpElement.getAttribute(new QName("uri-template"));
             if (uriTemplateAttr != null) {
 
-                    if (uriTemplateAttr.getAttributeValue().startsWith(HTTPEndpoint.legacyPrefix)) {
-                        httpEndpoint.setUriTemplate(UriTemplate.fromTemplate(
-                                uriTemplateAttr.getAttributeValue().substring(HTTPEndpoint.legacyPrefix.length())));
-                        // Set the address to the initial template value.
-                        definition.setAddress(uriTemplateAttr.getAttributeValue().
-                                substring(HTTPEndpoint.legacyPrefix.length()));
-                        httpEndpoint.setLegacySupport(true);
-                    } else {
+                String uriValue = uriTemplateAttr.getAttributeValue();
+                uriValue = resolverProvider.resolve(uriValue);
 
-                        httpEndpoint.setUriTemplate(UriTemplate.fromTemplate(uriTemplateAttr.getAttributeValue()));
-                        // Set the address to the initial template value.
-                        definition.setAddress(uriTemplateAttr.getAttributeValue());
-                        httpEndpoint.setLegacySupport(false);
-                    }
+                if (uriValue.startsWith(HTTPEndpoint.legacyPrefix)) {
+                    httpEndpoint.setUriTemplate(UriTemplate.fromTemplate(
+                            uriValue.substring(HTTPEndpoint.legacyPrefix.length())));
+                    // Set the address to the initial template value.
+                    definition.setAddress(uriValue.substring(HTTPEndpoint.legacyPrefix.length()));
+                    httpEndpoint.setLegacySupport(true);
+                } else {
 
-
+                    httpEndpoint.setUriTemplate(UriTemplate.fromTemplate(uriValue));
+                    // Set the address to the initial template value.
+                    definition.setAddress(uriValue);
+                    httpEndpoint.setLegacySupport(false);
+                }
             }
 
 

@@ -22,6 +22,7 @@ package org.apache.synapse.registry;
 import org.apache.axiom.om.OMElement;
 import org.apache.axiom.om.OMNode;
 import org.apache.synapse.config.Entry;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import java.util.Properties;
 
@@ -51,10 +52,11 @@ public interface Registry {
      *
      * @param entry the registry Entry
      * @param properties
+     * @param resolverProvider
      * @return the value from the registry or local cache
      * @see AbstractRegistry
      */
-    public Object getResource(Entry entry, Properties properties);
+    public Object getResource(Entry entry, Properties properties, ResolverProvider resolverProvider);
 
     /**
      * Get the registry entry for the given key

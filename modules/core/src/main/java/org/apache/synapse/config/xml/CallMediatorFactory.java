@@ -23,6 +23,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.config.xml.endpoints.EndpointFactory;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.endpoints.Endpoint;
 import org.apache.synapse.mediators.builtin.CallMediator;
 
@@ -81,7 +82,7 @@ public class CallMediatorFactory extends AbstractMediatorFactory {
     private static final QName ATT_AXIS2XML = new QName("axis2xml");
     private static final QName ATT_REPOSITORY = new QName("repository");
 
-    public Mediator createSpecificMediator(OMElement elem, Properties properties) {
+    public Mediator createSpecificMediator(OMElement elem, Properties properties, ResolverProvider resolverProvider) {
 
         CallMediator callMediator = new CallMediator();
 
@@ -92,7 +93,8 @@ public class CallMediatorFactory extends AbstractMediatorFactory {
         OMElement epElement = elem.getFirstChildWithName(ENDPOINT_Q);
         if (epElement != null) {
             // create the endpoint and set it in the call mediator
-            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true, properties);
+            Endpoint endpoint = EndpointFactory.getEndpointFromElement(epElement, true, properties,
+                                                                       resolverProvider);
             if (endpoint != null) {
                 callMediator.setEndpoint(endpoint);
             }

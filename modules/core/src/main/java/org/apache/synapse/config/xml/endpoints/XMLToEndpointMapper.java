@@ -23,6 +23,7 @@ import org.apache.synapse.config.XMLToObjectMapper;
 import org.apache.synapse.SynapseException;
 import org.apache.axiom.om.OMNode;
 import org.apache.axiom.om.OMElement;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 
 import java.util.Properties;
 
@@ -49,10 +50,10 @@ public class XMLToEndpointMapper implements XMLToObjectMapper {
      * @param om OMNode containing endpoint configuration. This should be an OMElement.
      * @return Endpoint implementation for the given OMNode.
      */
-    public Object getObjectFromOMNode(OMNode om, Properties properties) {
+    public Object getObjectFromOMNode(OMNode om, Properties properties, ResolverProvider resolverProvider) {
         if (om instanceof OMElement) {
             OMElement epElement = (OMElement) om;
-            return EndpointFactory.getEndpointFromElement(epElement, false, properties);
+            return EndpointFactory.getEndpointFromElement(epElement, false, properties, resolverProvider);
         } else {
             throw new SynapseException("Configuration is not in proper format.");
         }

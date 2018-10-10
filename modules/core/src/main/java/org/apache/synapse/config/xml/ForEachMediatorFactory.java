@@ -22,6 +22,7 @@ import org.apache.axiom.om.OMAttribute;
 import org.apache.axiom.om.OMElement;
 import org.apache.synapse.Mediator;
 import org.apache.synapse.SynapseConstants;
+import org.apache.synapse.config.xml.endpoints.utils.ResolverProvider;
 import org.apache.synapse.mediators.base.SequenceMediator;
 import org.apache.synapse.mediators.builtin.CallMediator;
 import org.apache.synapse.mediators.builtin.CalloutMediator;
@@ -60,7 +61,7 @@ public class ForEachMediatorFactory extends AbstractMediatorFactory {
 
     @Override
     protected Mediator createSpecificMediator(OMElement elem,
-                                              Properties properties) {
+                                              Properties properties, ResolverProvider resolverProvider) {
         ForEachMediator mediator = new ForEachMediator();
         processAuditStatus(mediator, elem);
 
@@ -93,7 +94,7 @@ public class ForEachMediatorFactory extends AbstractMediatorFactory {
         } else if ((sequence = elem.getFirstChildWithName(
                 new QName(XMLConfigConstants.SYNAPSE_NAMESPACE, "sequence"))) != null) {
             SequenceMediatorFactory fac = new SequenceMediatorFactory();
-            SequenceMediator sequenceMediator = fac.createAnonymousSequence(sequence, properties);
+            SequenceMediator sequenceMediator = fac.createAnonymousSequence(sequence, properties, resolverProvider);
             if (validateSequence(sequenceMediator)) {
                 mediator.setSequence(sequenceMediator);
             } else {
