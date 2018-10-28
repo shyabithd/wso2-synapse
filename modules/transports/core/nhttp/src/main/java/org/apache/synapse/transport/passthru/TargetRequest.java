@@ -441,5 +441,7 @@ public class TargetRequest {
     public Pipe getPipe() {
         return pipe;
     }
+
+    public URL getUrl(){return url; }
     
 }
