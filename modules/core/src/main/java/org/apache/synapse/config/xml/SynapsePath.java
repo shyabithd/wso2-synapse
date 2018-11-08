@@ -178,6 +178,7 @@ public abstract class SynapsePath extends AXIOMXPath {
                 }
                 return null;
             }
+			pipe.getInputStream().reset();
             try {
                 bufferedInputStream.reset();
             } catch (Exception e) {

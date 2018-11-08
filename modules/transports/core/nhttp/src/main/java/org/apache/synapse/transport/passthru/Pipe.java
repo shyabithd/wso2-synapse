@@ -435,6 +435,12 @@ public class Pipe {
 
     private class ByteBufferInputStream extends InputStream {
 
+        private int bufferPosition;
+
+        ByteBufferInputStream() {
+            bufferPosition = buffer.position();
+        }
+
         @Override
         public int read() throws IOException {
             lock.lock();
@@ -454,6 +460,16 @@ public class Pipe {
             }
         }
 
+        public void reset() {
+            lock.lock();
+            if(buffer != null) {
+                buffer.getByteBuffer().limit(buffer.getByteBuffer().capacity());
+                buffer.getByteBuffer().position(bufferPosition);
+                buffer.setInputMode();
+            }
+            lock.unlock();
+        }
+
         public int read(byte[] b, int off, int len) throws IOException {
             if (b == null) {
                 return 0;
@@ -463,6 +479,7 @@ public class Pipe {
             try {
                 if (!hasData(buffer)) {
                     waitForData();
+                    bufferPosition = buffer.position();
                     if(producerError){
                         return -1;
                     }
