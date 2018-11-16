@@ -73,7 +73,7 @@ public class AggregateMediatorSerializer extends AbstractMediatorSerializer {
 
         OMElement onCompleteElem = fac.createOMElement("onComplete", synNS);
         if (mediator.getAggregationExpression() != null) {
-            SynapseXPathSerializer.serializeXPath(
+            SynapsePathSerializer.serializePath(
                 mediator.getAggregationExpression(), onCompleteElem, "expression");
         }
         if (mediator.getOnCompleteSequenceRef() != null) {

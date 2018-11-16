@@ -127,7 +127,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             if (aggregateExpr != null) {
                 try {
                     mediator.setAggregationExpression(
-                        SynapseXPathFactory.getSynapseXPath(onComplete, EXPRESSION_Q));
+                        SynapsePathFactory.getSynapsePath(onComplete, EXPRESSION_Q));
                 } catch (JaxenException e) {
                     handleException("Unable to load the aggregating XPATH", e);
                 }
