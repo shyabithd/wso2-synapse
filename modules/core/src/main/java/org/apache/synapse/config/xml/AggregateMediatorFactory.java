@@ -90,8 +90,7 @@ public class AggregateMediatorFactory extends AbstractMediatorFactory {
             OMAttribute corelateExpr = corelateOn.getAttribute(EXPRESSION_Q);
             if (corelateExpr != null) {
                 try {
-                    mediator.setCorrelateExpression(
-                        SynapseXPathFactory.getSynapseXPath(corelateOn, EXPRESSION_Q));
+                    mediator.setCorrelateExpression(SynapsePathFactory.getSynapsePath(corelateOn, EXPRESSION_Q));
                 } catch (JaxenException e) {
                     handleException("Unable to load the corelate XPATH expression", e);
                 }

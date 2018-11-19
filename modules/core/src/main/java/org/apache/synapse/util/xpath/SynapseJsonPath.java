@@ -215,11 +215,10 @@ public class SynapseJsonPath extends SynapsePath {
                 }
             }
         } catch (IOException e) {
-            handleException("Error evaluating JSON Path <" + jsonPath.getPath() + ">", e);
-        } catch (Exception e) { // catch invalid json paths that do not match with the existing JSON payload.
-            log.error("#listValueOf. Error evaluating JSON Path <" + jsonPath.getPath() +
-                    ">. Returning empty result. Error >>> " + e.getLocalizedMessage());
-            handleException("Error evaluating JSON Path <" + jsonPath.getPath() + ">", e);
+            // catch invalid json paths that do not match with the existing JSON payload.
+            // not throwing the exception as done in Xpath
+            log.error("AggregateMediator Failed to evaluate correlate expression: " + jsonPath.getPath());
+            return null;
         }
         if (log.isDebugEnabled()) {
             log.debug("#listValueOf. Evaluated JSON path <" + jsonPath.getPath() + "> : <null>.");

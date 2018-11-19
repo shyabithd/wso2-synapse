@@ -87,7 +87,7 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
      * XPath that specifies a correlation expression that can be used to combine messages. An
      * example maybe //department@id="11"
      */
-    private SynapseXPath correlateExpression = null;
+    private SynapsePath correlateExpression = null;
     /**
      * An XPath expression that may specify a selected element to be aggregated from a group of
      * messages to create the aggregated message
@@ -196,7 +196,8 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
             // element in the current message prepare to correlate the messages on that
             Object result = null;
             if (correlateExpression != null) {
-                result = correlateExpression.evaluate(synCtx);
+                result = correlateExpression instanceof SynapseXPath ? correlateExpression.evaluate(synCtx) :
+                        ((SynapseJsonPath) correlateExpression).evaluate(synCtx);
                 if (result instanceof List) {
                     if (((List) result).isEmpty()) {
                         handleException("Failed to evaluate correlate expression: " + correlateExpression.toString(), synCtx);
@@ -616,11 +617,11 @@ public class AggregateMediator extends AbstractMediator implements ManagedLifecy
         return newCtx;
     }
 
-    public SynapseXPath getCorrelateExpression() {
+    public SynapsePath getCorrelateExpression() {
         return correlateExpression;
     }
 
-    public void setCorrelateExpression(SynapseXPath correlateExpression) {
+    public void setCorrelateExpression(SynapsePath correlateExpression) {
         this.correlateExpression = correlateExpression;
     }
 
